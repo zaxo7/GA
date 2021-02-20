@@ -70,7 +70,7 @@ void GA::init_logger()
 {
     BOOST_LOG_TRIVIAL(info) << "initialising logger";
 
-    //logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::error);
+    logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::error);
 }
 
 bool GA::check()
@@ -342,10 +342,10 @@ ga_result GA::solve()
 
 		if(iter == 0)
 		{
-			parentProb = NULL;
+			//parentProb = NULL;
 			
 			//get roulette wheel probability table where the highest prob for the first elements
-			parentProb = GA_h::dnorm(1,popSize);
+			//parentProb = GA_h::dnorm(1,popSize);
 		}
 
 		//SampleReplace(10, parentProb, perm, 2, ans);
@@ -354,12 +354,14 @@ ga_result GA::solve()
 		//fill the rest with crossover
 		for (int child = elitism; child < popSize; ++child)
 		{
-
+			parentProb = GA_h::dnorm(1,popSize);
 			//sample(popSize, parentProb, 2, &parentInd, 0, (*get_rand)(*random_engine));
 			/*parentInd = (int*)malloc(sizeof(int) * 2);
 			parentInd[0] = population[child]->chromo()[0];
 			parentInd[1] = population[child]->chromo()[1];*/
 			GA_h::ProbSampleNoReplace(popSize, parentProb, 2, parentInd);
+
+			std::cout << "crossover between " << parentInd[0] << " and " << parentInd[1] << std::endl;
 
 			BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " and parent " << parentInd[1] << " from the sorted population" << std::endl; 
 			//BOOST_LOG_TRIVIAL(info) << "seed = " << seed << std::endl; 

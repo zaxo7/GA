@@ -134,15 +134,31 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 			while(mutation[j] < genomeMin[i])
 				mutation[j] += genomeMin[i];
 			
+			//save the old val
+			int tmp = chromo[i];
+
 			//apply the mutationfound
 			chromo[i] = mutation[j];
 
+			for (int k = 0; k < genomeLen; ++k)
+			{
+				if(k != i && (chromo[k] == chromo[i]))
+					chromo[k] = tmp;
+			}
+
 			j++;
+
+			/*int tmp = chromo[i];
+			chromo[i] = chromo[tmp % genomeLen];
+			chromo[tmp % genomeLen] = tmp;*/
 		}
 	}
 
 	if(!allowRepeat)
+	{
 		GA_h::unique_chromo(chromo, genomeMin, genomeMax, genomeLen);
+
+	}
 
 			//set the calculated flag back to false bcs the cost will change
 	gen->rest_calculated();

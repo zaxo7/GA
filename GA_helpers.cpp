@@ -8,24 +8,49 @@ std::uniform_int_distribution<int> *get_rand = NULL;
 
 void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 {
+	/*int *v = NULL;
+
+	//this if need to be removed if the genMax or genMin are diffrent in some indexes
+	if(!v)
+	{
+		v = (int*)malloc(sizeof(int) * genomeLen);
+		for (int i = 1; i <= genomeLen; ++i)
+		{
+			v[i] = i;
+		}
+	}*/
+
+	//int iv = 0;
+
 	BOOST_LOG_TRIVIAL(info) << "unique chromo called";
-	BOOST_LOG_TRIVIAL(debug) << "before unique";
-	delete (new genome(chromo));
+	//BOOST_LOG_TRIVIAL(debug) << "before unique";
+	//delete (new genome(chromo));
 	//check for duplicates in the chromosome
-	int ind; 
+	int ind;
+	//int oldind;
 	while(true)
 	{
 		ind = GA_h::dup(chromo, genomeLen);
 		if(ind == -1)
 			break;
+		/*else
+		{
+			if(oldind != ind)
+			{
+				std::random_shuffle(v, v + genomeLen);
+				iv = 0;
+			}
+			oldind = ind;
+		}*/
 
 		chromo[ind] = chromo[ind] + 1;
+		//chromo[ind] = v[iv++ % genomeLen];
 
 		if(chromo[ind] > genMax[ind])
 			chromo[ind] = genMin[ind];
 	}
-	BOOST_LOG_TRIVIAL(debug) << "after unique";
-	delete (new genome(chromo));
+	//BOOST_LOG_TRIVIAL(debug) << "after unique";
+	//delete (new genome(chromo));
 }
 
 
@@ -72,17 +97,20 @@ int GA_h::dup(int *arr, int n)
             break;
         }
     }
- 
+ 		
+ 	bool found = false;
     // restore original array before returning
-    for (int i = 0; i < n; i++)
+    for (int i = n-1; i >= 0; i--)
     {
         // make negative elements positive
         if (arr[i] < 0)
             arr[i] = -arr[i];
-        if((duplicate+1) && (arr[i] == duplicate))
+        if(!found && (duplicate+1) && (arr[i] == duplicate))
+        {
         	duplicate = i;
+        	found = true;
+        }
     }
- 
     // return duplicate element
     return duplicate;
 }
@@ -144,7 +172,11 @@ void GA_h::ProbSampleNoReplace(int n, double *p,
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
 		random_engine->seed(time(NULL));
+
+		std::cout << "seeding ..." << std::endl;
 	}
+
+	//std::cout << "rand = " << (*get_rand)(*random_engine) << std::endl;
 
 	double rT, mass, totalmass;
 	int i, j, k, n1;
@@ -164,7 +196,7 @@ void GA_h::ProbSampleNoReplace(int n, double *p,
 	/* Compute the sample */
 	totalmass = 1;
 	for (i = 0, n1 = n - 1; i < nans; i++, n1--) {
-	rT = totalmass * (*get_rand)(*random_engine);
+	rT = totalmass * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
 	mass = 0;
 	for (j = 0; j < n1; j++) {
 	  mass += p[j];
