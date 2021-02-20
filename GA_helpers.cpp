@@ -64,7 +64,11 @@ double* GA_h::dnorm(int min, int max)
 
   	std::vector<double> prb = stats::dnorm(x, 0.0, (float)max/3, false);
 
-  	double *a = (double*)malloc(sizeof(double) * (max - min));
+  	static double *a = NULL;
+  	if(!a)
+  	{
+  		a = (double*)malloc(sizeof(double) * (max - min));
+  	}
 	
 	for (int i = 0; i < max - min; ++i)
 	{
@@ -163,9 +167,11 @@ static void revsort(double *a, int *ib, int n)
     }
 }
 
-void GA_h::ProbSampleNoReplace(int n, double *p,
+void GA_h::ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans)
 {
+   	static double *p = NULL;
+   	static int *perm = NULL;
 	if(!random_engine && !get_rand)
 	{
 		random_engine = new std::mt19937(random_device());
@@ -173,8 +179,13 @@ void GA_h::ProbSampleNoReplace(int n, double *p,
 
 		random_engine->seed(time(NULL));
 
-		std::cout << "seeding ..." << std::endl;
+		p = (double*)malloc(sizeof(double) * n);
+
+		perm = (int*)malloc(sizeof(int) * n);
 	}
+
+
+	memcpy(p, po, sizeof(double) * n);
 
 	//std::cout << "rand = " << (*get_rand)(*random_engine) << std::endl;
 
@@ -183,7 +194,7 @@ void GA_h::ProbSampleNoReplace(int n, double *p,
 
 	//srand48(seed);
 
-	int *perm = (int*)malloc(sizeof(int) * n);
+	
 
 	/* Record element identities */
 	for (i = 0; i < n; i++)
@@ -211,5 +222,13 @@ void GA_h::ProbSampleNoReplace(int n, double *p,
 	}
 	}
 
-	free(perm);
+	//ajust probabilities to get more diversity
+
+	for (int i = 0; i < nans; ++i)
+	{
+		std::cout << "ajusting weight from " << po[ans[i]];
+		po[ans[i]] += po[ans[i]]/(double)(n/2);
+		std::cout << " to " << po[ans[i]] << std::endl;
+	}
+
 }

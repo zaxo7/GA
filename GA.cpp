@@ -338,15 +338,9 @@ ga_result GA::solve()
 	//////////////////////////////////////////////////////////// Crossover
 		BOOST_LOG_TRIVIAL(info) << "applying crossover";
 
-		double* parentProb;
+		double* parentProb = NULL;
 
-		if(iter == 0)
-		{
-			//parentProb = NULL;
-			
-			//get roulette wheel probability table where the highest prob for the first elements
-			//parentProb = GA_h::dnorm(1,popSize);
-		}
+		parentProb = GA_h::dnorm(1,popSize);
 
 		//SampleReplace(10, parentProb, perm, 2, ans);
 		//ProbSampleNoReplace(10, parentProb, perm, 2, ans, 122);
@@ -354,7 +348,6 @@ ga_result GA::solve()
 		//fill the rest with crossover
 		for (int child = elitism; child < popSize; ++child)
 		{
-			parentProb = GA_h::dnorm(1,popSize);
 			//sample(popSize, parentProb, 2, &parentInd, 0, (*get_rand)(*random_engine));
 			/*parentInd = (int*)malloc(sizeof(int) * 2);
 			parentInd[0] = population[child]->chromo()[0];
@@ -372,6 +365,9 @@ ga_result GA::solve()
 
 			free(son);
 		}
+		/*free(parentProb);
+		parentProb = NULL;*/
+
 		nbr_crossovers += popSize - elitism;
 
 

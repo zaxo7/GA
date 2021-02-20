@@ -17,7 +17,7 @@ namespace GA_h
 	//check for duplicates
 	int dup(int *arr, int n);
 
-	void ProbSampleNoReplace(int n, double *p,
+	void ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans);
 }
 
