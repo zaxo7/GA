@@ -2,7 +2,8 @@
 Global
 -	find if it is possible to remove all the boost comments dynamicly
 --	remove additional inused headers in the include folder
-
+----	isolate the GA library and use it in tsp as an external library will be better
+!-----	reconstruct the make file to work in parallel and synchronised too : look for makefile prerequistics
 
 TSP class
 ---	add function to generate nearest neighbor tour		:can be converted from R code
@@ -15,6 +16,10 @@ GA class
 ----	fix the minimise and maximise flag behavior
 -----	add papply function to the constructor and solve function
 ---	try to encapsulate parameters in a struct or create multi constructors
+----	try to use parallel tasks : for ex when evaluating chromosomes ...
+	-----	begin with evaluation because it's the most heavy task
+	---	maybe selection 
+	---	then the mutation : also if he isn't using swap mutation and dosn't allow repeat repair chromosomes in parallel will be better
 
 
 
