@@ -177,6 +177,7 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
+
 		random_engine->seed(time(NULL));
 
 		p = (double*)malloc(sizeof(double) * n);
@@ -200,10 +201,24 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	for (i = 0; i < n; i++)
 		perm[i] = i;
 
+	/*std::cout << "before sort";
+
+	for (int i = 0; i < n; ++i)
+	{
+		std::cout << p[i] << ", ";
+	}*/
+
+
 	/* Sort probabilities into descending order */
 	/* Order element identities in parallel */
 	revsort(p, perm, n);
 
+	/*std::cout << std::endl << "after sort: " << std::endl;
+	
+	for (int i = 0; i < n; ++i)
+	{
+		std::cout << p[i] << ", ";
+	}*/
 	/* Compute the sample */
 	totalmass = 1;
 	for (i = 0, n1 = n - 1; i < nans; i++, n1--) {
@@ -224,11 +239,78 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 
 	//ajust probabilities to get more diversity
 
-	for (int i = 0; i < nans; ++i)
+	/*for (int i = 0; i < nans; ++i)
 	{
 		std::cout << "ajusting weight from " << po[ans[i]];
-		po[ans[i]] += po[ans[i]]/(double)(n/2);
+		po[ans[i]] -= po[ans[i]]/(double)(1);
 		std::cout << " to " << po[ans[i]] << std::endl;
+	}*/
+
+}
+
+
+static void SampleReplace(int k, int min_n, int n, int *y)
+{
+  int i;
+
+  for (i = 0; i < k; i++)
+    y[i] = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX) + min_n;
+}
+
+
+static void SampleNoReplace(int k, int min_n, int n, int *y, int *x)
+{
+  int i, j;
+
+  for (i = min_n; i < (n + min_n); i++)
+    x[i - min_n] = i;
+
+  for (i = 0; i < k; i++) 
+  {
+    j = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+    
+    y[i] = x[j];
+    x[j] = x[--n];
+  }
+}
+
+
+int *GA_h::sample(int k, int n, bool replace)
+{
+	return GA_h::sample(0, k, n, replace);
+}
+
+
+int *GA_h::sample(int min_k, int k, int n, bool replace)
+{
+	if(!random_engine && !get_rand)
+	{
+		random_engine = new std::mt19937(random_device());
+		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
+
+
+		random_engine->seed(time(NULL));
 	}
 
+
+	int* result = (int*)malloc(sizeof(int) * n);
+
+	if(replace)
+	{
+		SampleReplace(n, min_k, k, result);
+	}
+	else
+	{	
+		if (n > (k - min_k + 1)) 
+		{
+	        BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
+	        return NULL;
+      	}
+		int *tmp = (int*)malloc(sizeof(int) * n);
+		SampleNoReplace(n, min_k, k, result, tmp);
+		free(tmp);
+	}
+
+
+	return result;
 }

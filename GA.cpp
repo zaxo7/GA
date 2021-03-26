@@ -3,7 +3,7 @@
 
 
 
-GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMax, int **suggestions, int suggestions_count, int popSize, int iterations, float *terminationCost, bool minimise, float mutationChance, int elitism, monitor monitorFunc, eval evalFunc, selection selectionFunc, crossover crossoverFunc, mutation mutationFunc, bool allowrepeat, bool showSettings, bool verbose, char plapply)
+GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMax, int **suggestions, int suggestions_count, int popSize, int iterations, float *terminationCost, bool minimise, float mutationChance, int elitism, monitor monitorFunc, eval evalFunc, selection selectionFunc, crossover crossoverFunc, mutation mutationFunc, bool allowrepeat, bool showSettings, bool verbose)
 {
 	this->genomeLen = genomeLen;
 	this->codonMin = codonMin;
@@ -199,7 +199,7 @@ bool GA::check()
 	return true;
 }
 
-ga_result GA::solve()
+ga_result* GA::solve()
 {
 	BOOST_LOG_TRIVIAL(info) << "solving the GA";
 
@@ -225,8 +225,8 @@ ga_result GA::solve()
 
 	best_cost_set = false;
 
-	ga_result result;
-	result.size = genomeLen;
+	ga_result *result = (ga_result*)malloc(sizeof(ga_result));
+	result->size = genomeLen;
 
 	genome **newPopulation = NULL;
 
@@ -243,6 +243,9 @@ ga_result GA::solve()
 	//table to store 2 parents indexes for crossover 
 	int *parentInd  = (int*)malloc(sizeof(int) * 2);
 
+	//probability table for population to get crossover parents
+	double* parentProb = NULL;
+			
 	//best index
 	int bestInd;
 
@@ -251,6 +254,8 @@ ga_result GA::solve()
 	for(iter = 0; iter < iterations; iter++)
 	{
 		BOOST_LOG_TRIVIAL(info) << "starting iteration " << iter + 1;
+
+		//std::cout << iter << std::endl;
 
 		////////////////// Evaluation
 
@@ -304,7 +309,6 @@ ga_result GA::solve()
 			else
 				explored_space_before_best = bestInd;		
 		}
-
 		//sending results to monitor function
 		if(monitorFunc)		
 			monitorFunc(*collect(population[bestInd], iter));
@@ -313,10 +317,10 @@ ga_result GA::solve()
 		//check termination condition
 		if(terminationCost && *terminationCost >= bestEvals[iter])
 		{
-			result.explored_space = iter * popSize;
-			result.solve_time = time(NULL) - start_time;
-			result.best_genome.cost = population[bestInd]->get_cost();
-			result.best_genome.chromosome = population[bestInd]->chromo();
+			result->explored_space = iter * popSize;
+			result->solve_time = time(NULL) - start_time;
+			result->best_genome.cost = population[bestInd]->get_cost();
+			result->best_genome.chromosome = population[bestInd]->chromo();
 			return result;
 		}
 
@@ -338,9 +342,12 @@ ga_result GA::solve()
 	//////////////////////////////////////////////////////////// Crossover
 		BOOST_LOG_TRIVIAL(info) << "applying crossover";
 
-		double* parentProb = NULL;
+		if(!iter)
+		{
 
-		parentProb = GA_h::dnorm(1,popSize);
+			parentProb = GA_h::dnorm(1,popSize);
+		}
+
 
 		//SampleReplace(10, parentProb, perm, 2, ans);
 		//ProbSampleNoReplace(10, parentProb, perm, 2, ans, 122);
@@ -354,9 +361,12 @@ ga_result GA::solve()
 			parentInd[1] = population[child]->chromo()[1];*/
 			GA_h::ProbSampleNoReplace(popSize, parentProb, 2, parentInd);
 
-			std::cout << "crossover between " << parentInd[0] << " and " << parentInd[1] << std::endl;
+			parentProb[0] = parentProb[0] - popSize - 1;
+			parentProb[1] = parentProb[1] - popSize - 1;
 
-			BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " and parent " << parentInd[1] << " from the sorted population" << std::endl; 
+			//std::cout << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
+
+			BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
 			//BOOST_LOG_TRIVIAL(info) << "seed = " << seed << std::endl; 
 		
 			int *son = crossoverFunc((population[parentInd[0]])->chromo(), (population[parentInd[1]])->chromo(), genomeLen);
@@ -396,13 +406,13 @@ ga_result GA::solve()
 		if(mutationChance > 0)
 		{
 			BOOST_LOG_TRIVIAL(info) << "applying Mutation...";
-			float dampening_factor;
+			double dampening_factor;
 
 			for (int child = elitism; child < popSize; ++child)
 			{
-				dampening_factor = (iterations - iter) / iterations;
+				dampening_factor = (double)(iterations - iter) / iterations;
 
-				nbr_mutations += mutationFunc(population[child], mutationChance, genomeMin, genomeMax, allowrepeat, dampening_factor);
+				nbr_mutations += mutationFunc(population[child], mutationChance, genomeMin, genomeMax, dampening_factor, allowrepeat);
 				
 			}
 		}
@@ -412,6 +422,8 @@ ga_result GA::solve()
 		{
 			BOOST_LOG_TRIVIAL(info) << *population[i];
 		}
+
+		//sleep(2);
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "end of generations iteration reached";
@@ -435,7 +447,7 @@ ga_result GA::solve()
 
 	free(parentInd);
 	
-	return *collect(population[bestInd], iter);
+	return collect(population[bestInd], iter);
 }
 
 

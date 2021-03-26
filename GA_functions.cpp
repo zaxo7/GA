@@ -1,5 +1,9 @@
 #include "GA_functions.h"
 
+//random numbers generator
+extern std::random_device random_device;
+extern std::mt19937 *random_engine ;
+extern std::uniform_int_distribution<int> *get_rand;
 
 bool default_monitor(ga_result& state)
 {
@@ -71,9 +75,19 @@ int* default_crossover(int* parent1, int* parent2, int genomeLen)
 	return child;
 }
 
-int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *genomeMax, bool allowRepeat, float dampeningFactor)
+int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *genomeMax, double dampeningFactor, bool allowRepeat)
 {
 	BOOST_LOG_TRIVIAL(info) << "default_mutation called";
+
+	
+	if(!random_engine && !get_rand)
+	{
+		random_engine = new std::mt19937(random_device());
+		get_rand = new std::uniform_int_distribution<int>(genomeMin[0], genomeMax[0]);
+
+		random_engine->seed(time(NULL));
+	}	
+
 
 	int genomeLen = gen->size();
 
@@ -101,51 +115,83 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	//get the chromosome array
 	int* chromo = gen->chromo();
 
-	BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
+	//int* oldchromo = (int*)malloc(sizeof(int) * genomeLen);
+	//memcpy(oldchromo, chromo, sizeof(int) * genomeLen);
 
+	BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
 	
 
+	#ifdef MUTATION_1
 	//mutation directions
 	float direction[num_mut];
 
 	//mutation ranges
 	int mutationRange[num_mut];
+	
+	
+	std::vector<double> v2 = stats::runif<std::vector<double>>(1,num_mut,0,1);
+	
+	
+	#endif
+
 
 	//mutation new values
 	int mutation[num_mut];
 
 	int j = 0;
 
+
+
 	for (int i = 0; i < genomeLen; ++i)
 	{
 		if(mut_loc[i]) //if we are in the mutation location
 		{
 			BOOST_LOG_TRIVIAL(info) << "mutation number " << j << " at codon number " << i;
+			
+			#ifdef MUTATION_1
+			
 			//mutation direction
-			direction[j] = v[i] - 0.5; //to get range [-0.5 - 0.5]
+			direction[j] = v2[j] - 0.5; //to get range [-0.5 - 0.5]
 
 			//calculate the mutation range
 			mutationRange[j] = genomeMax[i] - genomeMin[i];
 
+			//std::cout << "chromo = " << chromo[i] << " direction = " << direction[j] << " mutation Range " << mutationRange[j] << " dampeningFactor = " << dampeningFactor << " genomeMax" << genomeMax[j] << std::endl;
+
 			//calculate the new value of codon to mutate
-			mutation[j] = ((int)round(chromo[i] + direction[j] * mutationRange[j] * dampeningFactor)) % genomeMax[i];
+			mutation[j] = (int)round(chromo[i] + direction[j] * mutationRange[j] * dampeningFactor) % (genomeMax[i] + 1);
+			
+			#else
+			
+			mutation[j] =  (*get_rand)(*random_engine) % (genomeMax[i] + 1);
+			
+			#endif
+			
+			//std::cout << "rounded too " << (int)round(chromo[i] + direction[j] * mutationRange[j] * dampeningFactor) << std::endl;
 
 			//check if the mutation is inside range
-			while(mutation[j] < genomeMin[i])
-				mutation[j] += genomeMin[i];
+			if(mutation[j] < genomeMin[i])
+				mutation[j] = genomeMin[i];
 			
-			//save the old val
+			//std::cout << chromo[i] << " to " << mutation[j] << std::endl;
+			
+			//save the old val to do a swap if we don't allow repeat
 			int tmp = chromo[i];
 
 			//apply the mutationfound
 			chromo[i] = mutation[j];
 
-			for (int k = 0; k < genomeLen; ++k)
+			#ifdef USE_SWAP_MUTATION
+			//find the duplicate and swap with it
+			if(!allowRepeat)
 			{
-				if(k != i && (chromo[k] == chromo[i]))
-					chromo[k] = tmp;
+				for (int k = 0; k < genomeLen; ++k)
+				{
+					if(k != i && (chromo[k] == chromo[i]))
+						chromo[k] = tmp;
+				}
 			}
-
+			#endif
 			j++;
 
 			/*int tmp = chromo[i];
@@ -157,7 +203,6 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	if(!allowRepeat)
 	{
 		GA_h::unique_chromo(chromo, genomeMin, genomeMax, genomeLen);
-
 	}
 
 			//set the calculated flag back to false bcs the cost will change
@@ -165,6 +210,15 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 
 	BOOST_LOG_TRIVIAL(info) << "chromosome after mutation : " << *gen;
 
+	/*int diff = 0;
+
+	for(int i = 0; i < genomeLen; i++)
+		if(chromo[i] != oldchromo[i])
+			diff++;
+	if(num_mut)
+		std::cout << "number of diffrences in " << num_mut << " mutations is = " << diff << std::endl;
+
+	free(oldchromo);*/
 	return num_mut;
 }
 

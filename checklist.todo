@@ -1,0 +1,24 @@
+	
+Global
+-	find if it is possible to remove all the boost comments dynamicly
+--	remove additional inused headers in the include folder
+
+
+TSP class
+---	add function to generate nearest neighbor tour		:can be converted from R code
+----	create functions for each variant simp dc and nse evaluation selection mutation ...
+-	add setters and getters for essential atributes
+--	find a way to send coords matrix to GA_engine
+----	add a file logging technique with filenames based on parameters and time line : output redirection can be enaugh
+
+GA class
+----	fix the minimise and maximise flag behavior
+-----	add papply function to the constructor and solve function
+---	try to encapsulate parameters in a struct or create multi constructors
+
+
+
+genome class:
+----	recheck the random genome generation with shuflle and rand replace it with GA_h::sample
+
+

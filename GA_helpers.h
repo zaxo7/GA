@@ -19,6 +19,10 @@ namespace GA_h
 
 	void ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans);
+
+	int *sample(int k, int n, bool replace);
+	
+	int *sample(int min_k, int k, int n, bool replace);
 }
 
 

@@ -5,12 +5,6 @@
 #include "GA_functions.h"
 #include "GA_helpers.h"
 
-//extern C because mylibml is compiled with gcc
-/*extern "C" 
-{
-#include "include/libml/src/ml.h"
-}*/
-
 
 
 
@@ -109,8 +103,8 @@ public:
 		mutation mutationFunc,
 		bool allowrepeat,
 		bool showSettings,
-		bool verbose,
-		char plapply);
+		bool verbose
+	);
 	//check ga settings
 	bool check();
 
@@ -120,7 +114,7 @@ public:
 	void init_logger();
 
 	//solving function
-	ga_result solve();
+	ga_result* solve();
 
 	//init the GA variables (population ...)
 	void init(genome **& population);
