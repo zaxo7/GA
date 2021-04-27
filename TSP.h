@@ -5,8 +5,11 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <functional>
 
 #include "GA.h"
+
+#include "TSP_func.h"
 
 enum GA_type
 {
@@ -33,9 +36,14 @@ private:
 
 	GA *GA_engine;
 
+	ga_result *result;
+
 	int genomeLen;
 	int codonMin;
 	int codonMax;
+
+	float** coordsMatrix;
+	float** wheightsMatrix;
 
 	//initial tour matrix
 	int **initial;
@@ -54,6 +62,10 @@ private:
 
 	bool allowrepeat;
 	bool verbose;
+
+	bool log;
+
+	string logFile;
 
 public:
 	
@@ -92,10 +104,22 @@ public:
 	//this method loads a benchmark coordinates data from .tsp file
 	//takes benchmark full path
 	float **load(std::string benchmark);
+
+	//this method calculates the distance between coordinates
+	float** getWeights();
+
+	//create the NN tour
+	int* ANN(float **coords = NULL);
 	
+	int nth(int row, int n, bool min = true, bool index_track = true);
 
 	static void setDefaultRoot(string root);
 
+	void print(bool log = false);
+
+	void setLogFile(string file);
+
+	void setLogging(bool l);
 
 	~TSP();
 };

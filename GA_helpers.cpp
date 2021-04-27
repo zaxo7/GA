@@ -67,7 +67,7 @@ double* GA_h::dnorm(int min, int max)
   	static double *a = NULL;
   	if(!a)
   	{
-  		a = (double*)malloc(sizeof(double) * (max - min));
+  		a = new double[(max - min)];//(double*)malloc(sizeof(double) * (max - min));
   	}
 	
 	for (int i = 0; i < max - min; ++i)
@@ -180,9 +180,9 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 
 		random_engine->seed(time(NULL));
 
-		p = (double*)malloc(sizeof(double) * n);
+		p = new double[n];//(double*)malloc(sizeof(double) * n);
 
-		perm = (int*)malloc(sizeof(int) * n);
+		perm = new int[n];//(int*)malloc(sizeof(int) * n);
 	}
 
 
@@ -293,7 +293,7 @@ int *GA_h::sample(int min_k, int k, int n, bool replace)
 	}
 
 
-	int* result = (int*)malloc(sizeof(int) * n);
+	int* result = new int[n];//(int*)malloc(sizeof(int) * n);
 
 	if(replace)
 	{
@@ -306,9 +306,9 @@ int *GA_h::sample(int min_k, int k, int n, bool replace)
 	        BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
 	        return NULL;
       	}
-		int *tmp = (int*)malloc(sizeof(int) * n);
+		int *tmp = new int[n];//(int*)malloc(sizeof(int) * n);
 		SampleNoReplace(n, min_k, k, result, tmp);
-		free(tmp);
+		delete[] tmp;
 	}
 
 

@@ -16,7 +16,7 @@ genome::genome(int *chromo)
 {
 	chromosome = NULL;
 	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
-	chromosome = (int*)malloc(sizeof(int) * chromoSize);
+	chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
 		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
@@ -31,7 +31,7 @@ genome::genome(genome *&gen)
 {
 	this->chromosome = NULL;
 	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
-	this->chromosome = (int*)malloc(sizeof(int) * chromoSize);
+	this->chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
 		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
@@ -46,8 +46,8 @@ genome::genome(genome *&gen)
 genome::genome()
 {
 	chromosome = NULL;
-	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
-	chromosome = (int*)malloc(sizeof(int) * chromoSize);
+	BOOST_LOG_TRIVIAL(debug) << "allocatig space for chromosome with length " << chromoSize;
+	chromosome = new int[chromoSize]; //(int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
 		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
@@ -74,8 +74,8 @@ genome::genome()
 genome::~genome()
 {
 	BOOST_LOG_TRIVIAL(debug) << "distructing genome " << this << " :" << *this;
-	free(this->chromosome);
-	chromosome = NULL;
+	delete[] this->chromosome;
+	this->chromosome = NULL;
 }
 
 int genome::size()

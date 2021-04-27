@@ -35,18 +35,27 @@ TSP::TSP()
     evalFunc = NULL;
     selectionFunc = NULL;
     crossoverFunc = NULL;
+    mutationFunc = NULL;
 
     allowrepeat = false;
     verbose = false;
+
+    log = true;
+
+    logFile = string("log.txt");
 }
 
 TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, bool fullPath) : TSP()
 {
     BOOST_LOG_TRIVIAL(debug) << "constructor 2 called"; 
+    cout << endl << "bench : " << benchmark << endl << "popSize : " << popSize << endl << "iterations : " << iterations << endl << "mutationChance : " << mutationChance << endl;
     if(fullPath)
-        load(benchmark);
+        coordsMatrix = load(benchmark);
     else
-        loadBench(benchmark);
+        coordsMatrix = loadBench(benchmark);
+
+    //calculate the arcs weights
+    wheightsMatrix = getWeights();
 
     this->popSize = popSize;
     this->iterations = iterations;
@@ -78,18 +87,21 @@ ga_result* TSP::solve(GA_type solve_type)
     if(!check())
         return NULL;
 
-    ga_result *res;
-
     prepare_parameters();
 
     if(!GA_engine)
+    {
         delete GA_engine;
+        GA_engine = NULL;
+    }
 
     GA_engine = init_engine();
 
-    res = GA_engine->solve();
+    result = GA_engine->solve();
 
-    return res;
+    print(false);
+    //print();
+    return result;
 }
 
 bool TSP::check()
@@ -141,6 +153,9 @@ GA* TSP::init_engine()
 
 void TSP::prepare_parameters()
 {
+    //init the weights matrix
+    set_weights(wheightsMatrix);
+
     bool is_rand_init = false;
 
     if(solve_type == SIMPLE_RND || (solve_type == DOUBLE_CHROMOSOME_RND) || (solve_type == NSE_RND))
@@ -155,6 +170,9 @@ void TSP::prepare_parameters()
         codonMin = 1;
         codonMax = benchSize;
 
+        if(evalFunc == NULL)
+            evalFunc = default_eval_simple;
+
     }
     else if(solve_type == DOUBLE_CHROMOSOME_NN || (solve_type == DOUBLE_CHROMOSOME_RND))
     {
@@ -165,6 +183,8 @@ void TSP::prepare_parameters()
         codonMin = 1;
         codonMax = benchSize;
 
+        if(evalFunc == NULL)
+            evalFunc = default_eval_dc;
     }
     else if(solve_type == NSE_NN || (solve_type == NSE_RND))
     {
@@ -175,18 +195,22 @@ void TSP::prepare_parameters()
         codonMin = 1;
         codonMax = benchSize;
 
+        if(evalFunc == NULL)
+            evalFunc = default_eval_nse;
     }
     if(!initial)
     {
         if(is_rand_init)
         {
-            initial = (int**)malloc(sizeof(int*));
+            initial = new int*;//(int**)malloc(sizeof(int*));
             initial[0] = GA_h::sample(codonMin, codonMax, genomeLen, allowrepeat);
             initial_count = 1;
         }    
         else
         {
-            //to do create the function that find the NN tour
+            initial = new int*;//(int**)malloc(sizeof(int*));
+            initial[0] = ANN();
+            initial_count = 1;        
         }
     }
 
@@ -260,7 +284,7 @@ float** TSP::load(string benchmark)
     	benchFile.seekg(0);
 
     	//create the buffer
-    	char *buffer = (char*)malloc(sizeof(char) * fileSize);
+    	char *buffer = new char[fileSize];//(char*)malloc(sizeof(char) * fileSize);
 
     	//read all the file
         benchFile.read(buffer, fileSize);
@@ -278,7 +302,8 @@ float** TSP::load(string benchmark)
 
         //convert buffer to string
         string text = string(buffer);
-        free(buffer);
+        delete[] buffer;
+        buffer = NULL;
 
         if(regex_search(text, matches, regBenchSize))
         {
@@ -294,12 +319,12 @@ float** TSP::load(string benchmark)
         	exit(-1);
         }
 
-        //alloc the matrix n*n 
-        coordsMatrix = (float**)malloc(sizeof(float*) * benchSize);
+        //alloc the matrix n*2 
+        coordsMatrix = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
 
         for(int i = 0; i < benchSize; i++)
         {
-            coordsMatrix[i] = (float*)malloc(sizeof(int)*2);
+            coordsMatrix[i] = new float[2];//(float*)malloc(sizeof(float)*2);
         }
 
   
@@ -330,6 +355,182 @@ float** TSP::load(string benchmark)
 	return coordsMatrix;
 }
 
+float** TSP::getWeights()
+{
+    BOOST_LOG_TRIVIAL(debug) << "getWeights called";
+    
+    float **wheightsMatrix = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
+    
+    for(int i = 0; i < benchSize; i++)
+        wheightsMatrix[i] = new float[benchSize];//(float*)malloc(sizeof(float) * benchSize);
+
+    for (int i = 0; i < benchSize; ++i)
+    {
+        for (int j = 0; j < benchSize; ++j)
+        {
+            if(i != j)
+            {
+                wheightsMatrix[i][j] = wheightsMatrix[j][i] = sqrt(pow(coordsMatrix[i][0] - coordsMatrix[j][0], 2) + pow(coordsMatrix[i][1] - coordsMatrix[j][1], 2));
+            }   
+        }
+    }
+
+
+    return wheightsMatrix;
+}
+
+
+int* TSP::ANN(float **coords)
+{
+    BOOST_LOG_TRIVIAL(debug) << "ANN called";
+
+    if(genomeLen == -1)
+        genomeLen = benchSize;
+
+    if(coords == NULL)
+        coords = wheightsMatrix;
+
+    int* tour = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
+    //trouver le max dans la matrice
+    int matrix_max = coords[0][0];
+    for (int i = 0; i < benchSize; ++i)
+    {
+        for (int j = 0; j < benchSize; ++j)
+        {
+            if(coords[i][j] > matrix_max)
+                matrix_max = coords[i][j];
+        }
+    }
+
+    //remplacer la valeur de la diagonale avec le max + 100
+    for (int i = 0; i < benchSize; ++i)
+    {
+        for (int j = 0; j < benchSize; ++j)
+        {
+            if(i == j)
+                coords[i][j] = matrix_max + 100;
+        }
+    }
+    /*cout << "---------------------------------------" << endl;
+    for (int i = 0; i < benchSize; ++i)
+    {   
+        cout << endl << i << " : ";
+        for (int j = 0; j < benchSize; ++j)
+        {
+            cout << wheightsMatrix[i][j] << ", ";
+        }
+    }
+    cout << endl;*/
+    //the tour begins from city 1
+    tour[0] = 1;
+
+    //cout << nth(31, 1) << endl;
+
+    for (int i = 1; i < benchSize; ++i)
+    {
+        int k = 1;
+        //find the k-th minimum in row i
+        int suiv = nth(tour[i - 1] - 1, k) + 1;
+
+        //cout << "first suiv for " << tour[i - 1] - 1 << " is " << suiv << endl;
+
+        //check if the city already exists in the tour
+        bool exists = false;
+        while(1)
+        {
+            exists = false;
+            for (int j = 0; j < i; ++j)
+            {
+                if(tour[j] == suiv)
+                    exists = true;
+            }
+            
+            if(exists)
+            {
+                // cout << "\n" << suiv << " exists in " << endl;
+                // for (int k = 0; k < i; ++k)
+                // {
+                //     cout << tour[k] << ", ";
+                // }
+                k++;
+                suiv = nth(tour[i - 1] - 1, k) + 1;
+            }
+            else
+            {
+                // cout << "\n" << suiv << " not exists in " << endl;
+                // for (int k = 0; k < i; ++k)
+                // {
+                //     cout << tour[k] << ", ";
+                // }
+                break;
+            }
+        }
+
+        tour[i] = suiv;
+    }
+
+    return tour;
+}
+
+
+bool compare(int a, int b, float* data)
+{
+    return data[a]<data[b];
+}
+
+float *v;
+int TSP::nth(int row, int n, bool min, bool index_track)
+{
+    if(!n)
+        return -2;
+
+    v = new float[benchSize];//(float*)malloc(sizeof(float) * benchSize);
+    int index[benchSize];
+
+    for (int i = 0; i < benchSize; ++i)
+    {
+        v[i] = wheightsMatrix[row][i];
+        index[i] = i;
+        //printf("%f, ", wheightsMatrix[row][i]);
+    }
+
+    //using namespace std::placeholders;
+    
+    sort(index, index + benchSize, std::bind(compare,  std::placeholders::_1, std::placeholders::_2, v));
+
+    // for (int i = 0; i < benchSize; ++i)
+    // {
+    //     cout << v[i] << ", ";
+    // }
+
+    // cout << endl;
+
+    // for (int i = 0; i < benchSize; ++i)
+    // {
+    //     cout << index[i] << ", ";
+    // }
+
+    // cout << endl;
+
+    if(min)
+    {
+
+        if(index_track)
+            return index[n - 1];
+        else
+            return v[n - 1];
+    }
+    else
+    {
+        if(index_track)
+            return index[benchSize - n];
+        else  
+            return v[benchSize - n];
+    }
+
+    return -1;
+}
+
 
 void TSP::setDefaultRoot(string root)
 {
@@ -338,6 +539,39 @@ void TSP::setDefaultRoot(string root)
 }
 
 
+void TSP::print(bool log)
+{
+    int    fd;
+    if(log)
+    {
+
+        fflush(stdout);
+        //fgetpos(stdout, &pos);
+        fd = dup(fileno(stdout));
+        freopen(logFile.c_str(), "a+", stdout);
+    }
+
+    cout << "\n\n\n\nResults for " << *benchName << endl;
+    GA_engine->print();
+
+    if(log)
+    {
+        fflush(stdout);
+        dup2(fd, fileno(stdout));
+        close(fd);
+    }
+}
+
+void TSP::setLogFile(string file)
+{
+    logFile = file;
+}
+
+
+void TSP::setLogging(bool l)
+{
+    log = l;
+}
 
 
 

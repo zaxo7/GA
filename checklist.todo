@@ -6,11 +6,13 @@ Global
 !-----	reconstruct the make file to work in parallel and synchronised too : look for makefile prerequistics
 
 TSP class
----	add function to generate nearest neighbor tour		:can be converted from R code
-----	create functions for each variant simp dc and nse evaluation selection mutation ...
++---	add function to generate nearest neighbor tour		:can be converted from R code
+	+----	create nth max and min function
+		+---	find a way to sort with indexes
++----	create functions for each variant simp dc and nse evaluation selection mutation ...
 -	add setters and getters for essential atributes
---	find a way to send coords matrix to GA_engine
-----	add a file logging technique with filenames based on parameters and time line : output redirection can be enaugh
++--	find a way to send coords matrix to GA_engine
++----	add a file logging technique with filenames based on parameters and time line : output redirection can be enaugh
 
 GA class
 ----	fix the minimise and maximise flag behavior
@@ -20,7 +22,6 @@ GA class
 	-----	begin with evaluation because it's the most heavy task
 	---	maybe selection 
 	---	then the mutation : also if he isn't using swap mutation and dosn't allow repeat repair chromosomes in parallel will be better
-
 
 
 genome class:

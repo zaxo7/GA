@@ -56,7 +56,7 @@ GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMa
 
 
 	res = NULL;
-	res = (ga_result*)malloc(sizeof(ga_result));
+	res = new ga_result;//(ga_result*)malloc(sizeof(ga_result));
 	if(!res)
 	{
 		BOOST_LOG_TRIVIAL(error) << "can't allocate space for result in collect function";
@@ -101,7 +101,7 @@ bool GA::check()
 	{
 		BOOST_LOG_TRIVIAL(info) << "initialising genomeMin by default to array with genomeLen*codonMin " << genomeLen << " * " << codonMin;
 		genomeMin = NULL;
-		genomeMin = (int*)malloc(sizeof(int) * genomeLen);
+		genomeMin = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
 
 		if(!genomeMin)
 		{
@@ -120,7 +120,7 @@ bool GA::check()
 		BOOST_LOG_TRIVIAL(info) << "initialising genomeMax by default to array with genomeLen*codonMax " << genomeLen << " * " << codonMax;
 		genomeMax = NULL;
 
-		genomeMax = (int*)malloc(sizeof(int) * genomeLen);
+		genomeMax = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
 		for (int codon = 0; codon < genomeLen; ++codon)
 		{
 			genomeMax[codon] = codonMax;
@@ -215,8 +215,8 @@ ga_result* GA::solve()
 	init(population);
 
 	//////////////////////////////////////////////////////////// Iterations
-	bestEvals = (float*)malloc(sizeof(float) * iterations);
-	meanEvals = (float*)malloc(sizeof(float) * iterations);
+	bestEvals = new float[iterations];//(float*)malloc(sizeof(float) * iterations);
+	meanEvals = new float[iterations];//(float*)malloc(sizeof(float) * iterations);
 	float evalVals[popSize];
 
 	//init counters
@@ -225,12 +225,12 @@ ga_result* GA::solve()
 
 	best_cost_set = false;
 
-	ga_result *result = (ga_result*)malloc(sizeof(ga_result));
+	ga_result *result = new ga_result;//(ga_result*)malloc(sizeof(ga_result));
 	result->size = genomeLen;
 
 	genome **newPopulation = NULL;
 
-	newPopulation = (genome**)malloc(sizeof(genome*) * popSize);
+	newPopulation = new genome*[popSize];//(genome**)malloc(sizeof(genome*) * popSize);
 
 	if(!newPopulation)
 	{
@@ -241,7 +241,7 @@ ga_result* GA::solve()
 	//genome **sortedPopulation = NULL;
 
 	//table to store 2 parents indexes for crossover 
-	int *parentInd  = (int*)malloc(sizeof(int) * 2);
+	int *parentInd  = new int[2];//(int*)malloc(sizeof(int) * 2);
 
 	//probability table for population to get crossover parents
 	double* parentProb = NULL;
@@ -321,6 +321,10 @@ ga_result* GA::solve()
 			result->solve_time = time(NULL) - start_time;
 			result->best_genome.cost = population[bestInd]->get_cost();
 			result->best_genome.chromosome = population[bestInd]->chromo();
+			
+			res->popSize = popSize;
+			res->iterations = iterations;
+			res->mutationChance = mutationChance;
 			return result;
 		}
 
@@ -373,7 +377,8 @@ ga_result* GA::solve()
 
 			newPopulation[child] = new genome(son);
 
-			free(son);
+			delete[] son;
+			son = NULL;
 		}
 		/*free(parentProb);
 		parentProb = NULL;*/
@@ -445,7 +450,8 @@ ga_result* GA::solve()
 		bestInd = minEval - evalVals;
 	}
 
-	free(parentInd);
+	delete[] parentInd;
+	parentInd = NULL;
 	
 	return collect(population[bestInd], iter);
 }
@@ -455,7 +461,7 @@ void GA::init(genome **& population)
 {
 	BOOST_LOG_TRIVIAL(info) << "initialising population ...";
 	//create population
-	population = (genome**)malloc(sizeof(genome*) * popSize);
+	population = new genome*[popSize];//(genome**)malloc(sizeof(genome*) * popSize);
 
 	if(!population)
 	{
@@ -479,13 +485,15 @@ void GA::init(genome **& population)
 	if(suggestions && (suggestions_count > 0))
 	{
 		BOOST_LOG_TRIVIAL(info) << "filling initial population with the given suggestions ...";
-		int *temp_genome = (int*)malloc(sizeof(int) * genomeLen);
+		int *temp_genome = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
 
 		for(int i = 0; i < suggestions_count; i++)
 		{
 			memcpy(temp_genome, suggestions[i], sizeof(int) * genomeLen);
 			population[pop_cursor++] = new genome(temp_genome);
 		}
+		delete[] temp_genome;
+		temp_genome = NULL;
 	}
 	else
 	{
@@ -514,6 +522,10 @@ ga_result* GA::collect(genome* bestGen, int iter)
 	res->best_genome.cost = bestGen->get_cost();
 	res->best_genome.chromosome = bestGen->chromo();
 
+	res->popSize = popSize;
+	res->iterations = iterations;
+	res->mutationChance = mutationChance;
+
 	return res;
 }
 
@@ -524,7 +536,10 @@ void GA::print()
 
 	using namespace std;
 
-	cout << "number of mutations = " << res->nbr_mutations << endl
+	cout << "popSize = " << res->popSize << endl
+		<< "iterations = " << res->iterations << endl
+		<< "mutationChance = " << res->mutationChance << endl
+		<< "number of mutations = " << res->nbr_mutations << endl
 		<< "numer of crossovers = " << res->nbr_crossovers << endl
 		//<< "explored space = " << res->explored_space << " solutions" << endl
 		<< "explored space until the best solution = " << res->explored_space_before_best << " solutions" << endl
@@ -563,26 +578,38 @@ std::ostream& operator<<(std::ostream& os, const GA& eng)
 GA::~GA()
 {
 	if(genomeMax)
-		free(genomeMax);
+	{
+		delete[] genomeMax;
+		genomeMax = NULL;
+	}
 
 	if(genomeMin)
-		free(genomeMin);
+	{
+		delete[] genomeMin;
+		genomeMin = NULL;
+	}
 
 	if(suggestions)
 	{
 		for (int i = 0; i < suggestions_count; ++i)
 		{
-			free(suggestions[i]);
+			delete suggestions[i];
+			suggestions[i] = NULL;
 		}
-		free(suggestions);
+		delete[] suggestions;
+		suggestions = NULL;
 	}
 
 	if(terminationCost)
-		free(terminationCost);
+	{
+		delete terminationCost;
+		terminationCost = NULL;
+	}
 
 	delete random_engine;
+	random_engine = NULL;
 
 	delete get_rand;
-
+	get_rand = NULL;
 
 }

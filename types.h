@@ -27,6 +27,10 @@ struct ga_result
 	int size;
 	unsigned long solve_time;
 	genome_str best_genome;
+
+	int popSize;
+	int iterations;
+	float mutationChance;
 };
 
 //monitor function type

@@ -46,7 +46,7 @@ int* default_crossover(int* parent1, int* parent2, int genomeLen)
 {
 	BOOST_LOG_TRIVIAL(info) << "default_crossover called";
 	int* child = NULL;
-	child = (int *)malloc(sizeof(int) * genomeLen);
+	child = new int[genomeLen];//(int *)malloc(sizeof(int) * genomeLen);
 	if(!child)
 	{
 		BOOST_LOG_TRIVIAL(error) << "can't allocate space for new child";
