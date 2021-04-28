@@ -105,6 +105,8 @@ int main(int argc, char const *argv[])
 
 		cout << "solving " << bench << " SIMPLE_NN" << endl;
 
+		int total_time = 0;
+
 		for (int j = 0; j < 64; j++)
 		{
 			if(solver != NULL)
@@ -118,6 +120,7 @@ int main(int argc, char const *argv[])
 
 			results[j] = solver->solve(SIMPLE_NN);
 			
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
@@ -167,6 +170,7 @@ int main(int argc, char const *argv[])
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " SIMPLE_RND" << endl;
 
+		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -179,6 +183,8 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			results[j] = solver->solve(SIMPLE_RND);
+
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
@@ -228,6 +234,7 @@ int main(int argc, char const *argv[])
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " DOUBLE_CHROMOSOME_NN" << endl;
 
+		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -240,6 +247,8 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			results[j] = solver->solve(DOUBLE_CHROMOSOME_NN);
+
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
@@ -288,6 +297,7 @@ int main(int argc, char const *argv[])
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " DOUBLE_CHROMOSOME_RND" << endl;
 
+		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -300,6 +310,8 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			results[j] = solver->solve(DOUBLE_CHROMOSOME_RND);
+
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
@@ -348,6 +360,7 @@ int main(int argc, char const *argv[])
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " NSE_NN" << endl;
 
+		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -360,6 +373,8 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			results[j] = solver->solve(NSE_NN);
+
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
@@ -409,6 +424,7 @@ int main(int argc, char const *argv[])
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " NSE_RND" << endl;
 
+		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -421,6 +437,8 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			results[j] = solver->solve(NSE_RND);
+
+			total_time += results[j]->solve_time;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
