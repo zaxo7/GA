@@ -11,7 +11,7 @@ CC = g++
 
 LIBML = -Linclude/libml/lib/ -lml
 
-CFlags = -g -Wall
+CFlags = -g  -Wall
 
 OBJDIR := ./obj/
 GA_lib_obj := $(addprefix $(OBJDIR)/, GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o)

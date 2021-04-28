@@ -304,7 +304,8 @@ float** TSP::load(string benchmark)
         smatch matches;
 
         //convert buffer to string
-        string text = string(buffer);
+        string text = string(buffer, fileSize);
+        
         delete[] buffer;
         buffer = NULL;
 

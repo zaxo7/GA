@@ -176,12 +176,12 @@ static void revsort(double *a, int *ib, int n)
 }
 double *p = NULL;
 int *perm = NULL;
-void GA_h::ProbSampleNoReplace(int n, double *po,
+void GA_h::ProbSampleNoReplace(const int n, double *po,
                                 int nans, int *ans)
 {
 	//BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
 
-	if(!p && !perm)
+	if(!p || !perm)
 	{
 		/*random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
