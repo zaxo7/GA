@@ -84,11 +84,11 @@ int GA_h::dup(int *arr, int n)
 	//BOOST_LOG_TRIVIAL(info) << "dup called";
     int duplicate = -1;
 
-    std::cout << std::endl << "i got this chromo :";
+    /*std::cout << std::endl << "i got this chromo :";
     for (int i = 0; i < n; ++i)
     {
     	std::cout << arr[i] << ", ";
-    }
+    }*/
 
     fflush(stdout);
  
@@ -181,15 +181,15 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 {
 	BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
 
-	if(!p && !perm)
+	if(!p || !perm || !random_engine || !get_rand)
 	{
-		/*random_engine = new std::mt19937(random_device());
+		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
 
-		random_engine->seed(time(NULL));*/
+		random_engine->seed(time(NULL));
 
-		srand48(time(NULL));
+		//srand48(time(NULL));
 
 		p = new double[n];//(double*)malloc(sizeof(double) * n);
 
@@ -229,24 +229,28 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	
 	for (int i = 0; i < n; ++i)
 	{
-		std::cout << p[i] << ", ";
-	}*/
+		std::cout << perm[i] << ", ";
+	}
+	*/
 	/* Compute the sample */
 	totalmass = 1;
-	for (i = 0, n1 = n - 1; i < nans; i++, n1--) {
-	rT = totalmass * (((float) rand())/((float) RAND_MAX));//((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
-	mass = 0;
-	for (j = 0; j < n1; j++) {
-	  mass += p[j];
-	  if (rT <= mass)
-	    break;
-	}
-	ans[i] = perm[j];
-	totalmass -= p[j];
-	for (k = j; k < n1; k++) {
-	  p[k] = p[k + 1];
-	  perm[k] = perm[k + 1];
-	}
+	for (i = 0, n1 = n - 1; i < nans; i++, n1--) 
+	{
+		rT = totalmass * /*(((float) rand())/((float) RAND_MAX));//*/((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+		mass = 0;
+		for (j = 0; j < n1; j++)
+		{
+		  mass += p[j];
+		  if (rT <= mass)
+		    break;
+		}
+		ans[i] = perm[j];
+		totalmass -= p[j];
+		for (k = j; k < n1; k++) 
+		{
+		  p[k] = p[k + 1];
+		  perm[k] = perm[k + 1];
+		}
 	}
 
 	//ajust probabilities to get more diversity

@@ -256,9 +256,9 @@ ga_result* GA::solve()
 	double* parentProb = NULL;
 			
 	//best index
-	int bestInd;
+	int bestInd = -1;
 
-	int iter;
+	int iter = 0;
 
 	for(iter = 0; iter < iterations; iter++)
 	{
@@ -371,6 +371,11 @@ ga_result* GA::solve()
 			parentProb[0] = parentProb[0] - popSize - 1;
 			parentProb[1] = parentProb[1] - popSize - 1;
 
+			if((parentInd[0] >= popSize || (parentInd[0] < 0)) || (parentInd[1] >= popSize || (parentInd[1] < 0)))
+			{
+				BOOST_LOG_TRIVIAL(error) << "error in parent indexes = " << parentInd[0] << " " << parentInd[0];
+				exit(-1);
+			}
 			//std::cout << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
 
 			BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 

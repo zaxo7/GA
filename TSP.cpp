@@ -223,14 +223,14 @@ float** TSP::loadBench(string benchmark, string root)
 {
     BOOST_LOG_TRIVIAL(debug) << "loading bench : " << benchmark;
 	if(!benchName)
-        benchName = new string(benchmark);
+        benchName = new string(benchmark.c_str());
 
     if(!benchPath)
 	   benchmark = root.append(benchmark).append(".tsp");
 
     BOOST_LOG_TRIVIAL(debug) << "created full path " << benchmark ;
 
-    benchPath = new string(benchmark);
+    benchPath = new string(benchmark.c_str());
 
 	return load(benchmark);
 }
@@ -243,9 +243,9 @@ float** TSP::load(string benchmark)
     if(!benchName)
     {
         if(!benchPath)
-            benchPath = new string(benchmark);
+            benchPath = new string(benchmark.c_str());
 
-        benchName = new string(benchmark);
+        benchName = new string(benchmark.c_str());
 
         //get what after the last slash
         int index = benchName->find_last_of("\\/");
@@ -373,7 +373,7 @@ float** TSP::getWeights()
         {
             if(i != j)
             {
-                weightsMat[i][j] = weightsMat[j][i] = round(sqrt(pow(coordsMatrix[i][0] - coordsMatrix[j][0], 2) + pow(coordsMatrix[i][1] - coordsMatrix[j][1], 2)));
+                weightsMat[i][j] = weightsMat[j][i] = sqrt(pow(coordsMatrix[i][0] - coordsMatrix[j][0], 2) + pow(coordsMatrix[i][1] - coordsMatrix[j][1], 2));
             }
             else
             {
@@ -603,6 +603,8 @@ void TSP::setLogging(bool l)
 
 TSP::~TSP()
 {
+    BOOST_LOG_TRIVIAL(debug) << "destructing TSP object";
+
     delete benchName;
     benchName = NULL;
     delete benchPath;
