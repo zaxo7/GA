@@ -1,7 +1,6 @@
 #include "GA.h"
 
-
-
+// extern float** coordsMatrix;
 
 GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMax, int **suggestions, int suggestions_count, int popSize, int iterations, float *terminationCost, bool minimise, float mutationChance, int elitism, monitor monitorFunc, eval evalFunc, selection selectionFunc, crossover crossoverFunc, mutation mutationFunc, bool allowrepeat, bool showSettings, bool verbose)
 {
@@ -221,6 +220,7 @@ ga_result* GA::solve()
 	
 	init(population);
 
+
 	//////////////////////////////////////////////////////////// Iterations
 	if(!bestEvals)
 		bestEvals = new float[iterations];//(float*)malloc(sizeof(float) * iterations);
@@ -263,6 +263,7 @@ ga_result* GA::solve()
 	for(iter = 0; iter < iterations; iter++)
 	{
 		BOOST_LOG_TRIVIAL(info) << "starting iteration " << iter + 1;
+		
 
 		//std::cout << iter << std::endl;
 
@@ -270,6 +271,10 @@ ga_result* GA::solve()
 
 		BOOST_LOG_TRIVIAL(info) << "calculating evaluation values";
 		
+		/*std::cout << iter << std::endl;
+		checkCoords();
+		std::cout << "ok1" << std::endl;*/
+
 		for(int chromo = 0; chromo < popSize; chromo++)
 			evalVals[chromo] = population[chromo]->get_cost();
 
@@ -329,10 +334,12 @@ ga_result* GA::solve()
 			return collect(population[bestInd], iter);
 		}
 
+		
 	//////////////////////////////////////////////////////////// Selection
 		BOOST_LOG_TRIVIAL(info) << "applying selection";
 
 		/*sortedPopulation = */selectionFunc(population, popSize);
+
 
 		BOOST_LOG_TRIVIAL(debug) << "the elite members";
 
@@ -347,12 +354,19 @@ ga_result* GA::solve()
 	//////////////////////////////////////////////////////////// Crossover
 		BOOST_LOG_TRIVIAL(info) << "applying crossover";
 
+		/*std::cout << iter << std::endl;
+		checkCoords();
+		std::cout << "ok2" << std::endl;*/
+
 		if(!iter)
 		{
-
 			parentProb = GA_h::dnorm(1,popSize);
 		}
 
+		/*std::cout << iter << std::endl;
+		checkCoords();
+		std::cout << "ok3" << std::endl;*/
+		
 
 		//SampleReplace(10, parentProb, perm, 2, ans);
 		//ProbSampleNoReplace(10, parentProb, perm, 2, ans, 122);
@@ -428,6 +442,7 @@ ga_result* GA::solve()
 		{
 			BOOST_LOG_TRIVIAL(info) << "applying Mutation...";
 			double dampening_factor;
+			
 
 			for (int child = elitism; child < popSize; ++child)
 			{
@@ -469,6 +484,7 @@ ga_result* GA::solve()
 			delete[] parentInd;
 			parentInd = NULL;
 		}
+
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "end of generations iteration reached";
@@ -664,3 +680,13 @@ GA::~GA()
 	GA_h::free_GA_helpers_vars();
 
 }
+
+
+// void GA::checkCoords()
+// {
+//     for (int i = 0; i < genome::size(); ++i)
+//     {
+//             if(coordsMatrix[i][0] < 0 || (coordsMatrix[i][1] < 0))
+//                 exit(-10);            
+//     }
+// }

@@ -11,4 +11,6 @@ float eval_tour(int *chromosome);
 
 void set_weights(float** w);
 
+void free_weights();
+
 #endif

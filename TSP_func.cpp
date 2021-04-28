@@ -1,6 +1,6 @@
 #include "TSP_func.h"
 
-float** weights;
+float** weights = NULL;
 
 float default_eval_simple(int* chromosome)
 {
@@ -73,11 +73,15 @@ float eval_tour(int *chromosome)
 void set_weights(float** w)
 {
 	BOOST_LOG_TRIVIAL(debug) << "set_weights called genome size = " << genome::size();	
-	weights = w;
+	//weights = w;
+	weights = new float*[genome::size()];
+
 	for (int i = 0; i < genome::size(); ++i)
 	{
+		weights[i] = new float[genome::size()];
 		for (int j = 0; j < genome::size(); ++j)
 		{
+			weights[i][j] = w[i][j];
 			if(w[i][j] < 0)
 			{
 				std::cout << "w[" << i << "][" << j << "] = " << w[i][j] << std::endl;
@@ -87,3 +91,19 @@ void set_weights(float** w)
 		//std::cout << std::endl;
 	}
 }
+
+
+void free_weights()
+{
+	BOOST_LOG_TRIVIAL(debug) << "freeing weights with size " << genome::size() << "*" << genome::size();
+	for (int i = 0; i < genome::size(); ++i)
+	{
+		delete[] weights[i];
+		weights[i] = NULL;
+	}
+	delete[] weights;
+	weights = NULL;
+}
+
+
+

@@ -119,6 +119,7 @@ int main(int argc, char const *argv[])
 			cout << "ok" << endl;
 
 			results[j] = solver->solve(SIMPLE_RND);
+			
 
 			cout << "brrrr" << endl;
 

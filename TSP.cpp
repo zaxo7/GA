@@ -4,6 +4,8 @@ using namespace std;
 
 string TSP::default_root = string("./benchmarks/");
 
+//extern float** coordsMatrix;
+
 TSP::TSP()
 {
     BOOST_LOG_TRIVIAL(debug) << "constructor 1 called";	
@@ -54,8 +56,10 @@ TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, bo
     else
         coordsMatrix = loadBench(benchmark);
 
+
     //calculate the arcs weights
     weightsMatrix = getWeights();
+    
 
     this->popSize = popSize;
     this->iterations = iterations;
@@ -97,8 +101,9 @@ ga_result* TSP::solve(GA_type solve_type)
 
     GA_engine = init_engine();
 
-    result = GA_engine->solve();
 
+    result = GA_engine->solve();
+    
     print(false);
     //print();
     return result;
@@ -323,6 +328,7 @@ float** TSP::load(string benchmark)
         }
 
         //alloc the matrix n*2 
+        BOOST_LOG_TRIVIAL(debug) << "allocating coordsMatrix with " << benchSize << " * " << 2;
         coordsMat = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
 
         for(int i = 0; i < benchSize; i++)
@@ -349,7 +355,7 @@ float** TSP::load(string benchmark)
 	           	coordsMat[i][0] =  stof(matches[1]);
                	coordsMat[i++][1] =  stof(matches[2]);
 
-	           	//BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
+	           	BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
 	        }
 	        
         }
@@ -484,6 +490,8 @@ int* TSP::ANN(float **coords)
         tour[i] = suiv;
     }
 
+    coords = NULL;
+
     return tour;
 }
 
@@ -604,6 +612,7 @@ void TSP::setLogging(bool l)
 TSP::~TSP()
 {
     BOOST_LOG_TRIVIAL(debug) << "destructing TSP object";
+    //checkCoords();
 
     delete benchName;
     benchName = NULL;
@@ -614,7 +623,9 @@ TSP::~TSP()
     GA_engine = NULL;
 
     for (int i = 0; i < benchSize; ++i)
-    {
+    {   
+        BOOST_LOG_TRIVIAL(debug) << "deleting coordsMatrix[" << i << "] :" << coordsMatrix[i];
+        std::cout << coordsMatrix[i][0] << " , " << coordsMatrix[i][1] << std::endl;
         delete[] coordsMatrix[i];
         coordsMatrix[i] = NULL;
         delete[] weightsMatrix[i];
@@ -640,6 +651,18 @@ TSP::~TSP()
     delete termination_cost;
     termination_cost = NULL;
 
+    free_weights();
 
     delete[] v;
 }
+
+
+
+// void TSP::checkCoords()
+// {
+//     for (int i = 0; i < genome::size(); ++i)
+//     {
+//             if(coordsMatrix[i][0] < 0 || (coordsMatrix[i][1] < 0))
+//                 exit(-10);            
+//     }
+// }

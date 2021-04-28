@@ -42,8 +42,9 @@ private:
 	int codonMin;
 	int codonMax;
 
-	float** coordsMatrix;
+	
 	float** weightsMatrix;
+	float** coordsMatrix;
 
 	//initial tour matrix
 	int **initial;
@@ -120,6 +121,8 @@ public:
 	void setLogFile(string file);
 
 	void setLogging(bool l);
+
+	// void checkCoords();
 
 	~TSP();
 };

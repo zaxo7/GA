@@ -130,6 +130,8 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const GA& eng);
 
 	~GA();
+
+	// void checkCoords();
 };
 
 

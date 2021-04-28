@@ -1,5 +1,6 @@
 #include "GA_helpers.h"
 
+// float** coordsMatrix = NULL;
 
 //random numbers generator
 std::random_device random_device;
@@ -53,6 +54,7 @@ void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 	//delete (new genome(chromo));
 }
 
+double *a = NULL;
 
 double* GA_h::dnorm(int min, int max)
 {
@@ -64,16 +66,21 @@ double* GA_h::dnorm(int min, int max)
 
   	std::vector<double> prb = stats::dnorm(x, 0.0, (float)max/3, false);
 
-  	static double *a = NULL;
+
   	if(!a)
   	{
   		a = new double[(max - min)];//(double*)malloc(sizeof(double) * (max - min));
   	}
+  	
 	
-	for (int i = 0; i < max - min; ++i)
+	for (int i = 0; i < (max - min); ++i)
 	{
 		a[i] = prb[i];
 	}
+
+	/*std::cout << "ok 1.1" << std::endl;
+  	checkCoords();
+  	std::cout << "ok 1.2" << std::endl;*/
 
 	return a;
 }
@@ -343,4 +350,16 @@ void GA_h::free_GA_helpers_vars()
 	random_engine = NULL;
 	delete get_rand;
 	get_rand = NULL;
+
+	//delete[] a;
+	a = NULL;
 }
+
+// void GA_h::checkCoords()
+// {
+//     for (int i = 0; i < genome::size(); ++i)
+//     {
+//             if(coordsMatrix[i][0] < 0 || (coordsMatrix[i][1] < 0))
+//                 exit(-10);            
+//     }
+// }

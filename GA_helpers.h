@@ -25,6 +25,8 @@ namespace GA_h
 	int *sample(int min_k, int k, int n, bool replace);
 
 	void free_GA_helpers_vars();
+
+	// void checkCoords();
 }
 
 
