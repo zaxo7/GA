@@ -118,7 +118,7 @@ int main(int argc, char const *argv[])
 
 			cout << "ok" << endl;
 
-			results[j] = solver->solve(SIMPLE_NN);
+			results[j] = solver->solve(SIMPLE_RND);
 
 			cout << "brrrr" << endl;
 
@@ -128,6 +128,10 @@ int main(int argc, char const *argv[])
 				min_cost_ind = j;
 			}
 			cout << 64 - j << " iterations left" << endl;
+
+			//delete solver;
+
+			//exit(1);
 		}
 		
 		cout << "results for benchmark" << bench << "with SIMPLE_NN" << endl;

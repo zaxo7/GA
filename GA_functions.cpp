@@ -17,7 +17,7 @@ genome** default_selection(genome**& population, int popSize)
 	sortedPopulation = (genome**)malloc(sizeof(genome*) * popSize);
 	if(!sortedPopulation)
 	{
-		BOOST_LOG_TRIVIAL(error) << "can't allocate the sortedPopulation";
+		//BOOST_LOG_TRIVIAL(error) << "can't allocate the sortedPopulation";
 		exit(-1);
 	}*/
 
@@ -31,11 +31,11 @@ genome** default_selection(genome**& population, int popSize)
 	//sorting the population
 	std::sort(population, population + popSize, gen_comp);
 
-	BOOST_LOG_TRIVIAL(debug) << "the sorted population";
+	//BOOST_LOG_TRIVIAL(debug) << "the sorted population";
 
 	for (int i = 0; i < popSize; ++i)
 	{
-		BOOST_LOG_TRIVIAL(debug) << *population[i];
+		//BOOST_LOG_TRIVIAL(debug) << *population[i];
 	}
 
 
@@ -44,18 +44,18 @@ genome** default_selection(genome**& population, int popSize)
 
 int* default_crossover(int* parent1, int* parent2, int genomeLen)
 {
-	BOOST_LOG_TRIVIAL(info) << "default_crossover called";
+	//BOOST_LOG_TRIVIAL(info) << "default_crossover called";
 	int* child = NULL;
 	child = new int[genomeLen];//(int *)malloc(sizeof(int) * genomeLen);
 	if(!child)
 	{
-		BOOST_LOG_TRIVIAL(error) << "can't allocate space for new child";
+		//BOOST_LOG_TRIVIAL(error) << "can't allocate space for new child";
 		exit(-1);
 	}
 
 	int cross_point = my_rand();
 
-	BOOST_LOG_TRIVIAL(info) << "cross_point = " << cross_point;
+	//BOOST_LOG_TRIVIAL(info) << "cross_point = " << cross_point;
 
 	if(cross_point == 0)
 	{
@@ -77,7 +77,7 @@ int* default_crossover(int* parent1, int* parent2, int genomeLen)
 
 int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *genomeMax, double dampeningFactor, bool allowRepeat)
 {
-	BOOST_LOG_TRIVIAL(info) << "default_mutation called";
+	//BOOST_LOG_TRIVIAL(info) << "default_mutation called";
 
 	
 	if(!random_engine && !get_rand)
@@ -118,7 +118,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	//int* oldchromo = (int*)malloc(sizeof(int) * genomeLen);
 	//memcpy(oldchromo, chromo, sizeof(int) * genomeLen);
 
-	BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
+	//BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
 	
 
 	#ifdef MUTATION_1
@@ -146,7 +146,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	{
 		if(mut_loc[i]) //if we are in the mutation location
 		{
-			BOOST_LOG_TRIVIAL(info) << "mutation number " << j << " at codon number " << i;
+			//BOOST_LOG_TRIVIAL(info) << "mutation number " << j << " at codon number " << i;
 			
 			#ifdef MUTATION_1
 			
@@ -208,7 +208,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 			//set the calculated flag back to false bcs the cost will change
 	gen->rest_calculated();
 
-	BOOST_LOG_TRIVIAL(info) << "chromosome after mutation : " << *gen;
+	//BOOST_LOG_TRIVIAL(info) << "chromosome after mutation : " << *gen;
 
 	/*int diff = 0;
 

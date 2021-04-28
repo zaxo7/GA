@@ -26,3 +26,11 @@ bool init_my_rand(int min, int max)
 
 	return true;
 }
+
+void free_genome_vars()
+{
+	delete random_eng;
+	random_eng = NULL;
+	delete get_rnd;
+	get_rnd = NULL;
+}
