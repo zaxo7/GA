@@ -43,7 +43,7 @@ GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMa
 	meanEvals = NULL;
 
 
-	BOOST_LOG_TRIVIAL(info) << "creating GA object";
+	//BOOST_LOG_TRIVIAL(info) << "creating GA object";
 
 	init_logger();
 
@@ -65,53 +65,53 @@ GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMa
 
 	if(!res)
 	{
-		BOOST_LOG_TRIVIAL(error) << "can't allocate space for result in collect function";
+		//BOOST_LOG_TRIVIAL(error) << "can't allocate space for result in collect function";
 		exit(-1);
 	}
 }
 
-//namespace logging = boost::log;
+//namespace logging = //BOOST::log;
 
 void GA::init_logger()
 {
-    BOOST_LOG_TRIVIAL(info) << "initialising logger";
+    //BOOST_LOG_TRIVIAL(info) << "initialising logger";
 
     //logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::error);
 }
 
 bool GA::check()
 {
-	BOOST_LOG_TRIVIAL(info) << "checking parameters ...";
+	//BOOST_LOG_TRIVIAL(info) << "checking parameters ...";
 
 	using namespace std;
 
 	if(genomeLen < 1)
 	{
-		BOOST_LOG_TRIVIAL(error) << "genomeLen can't be < 1";
+		//BOOST_LOG_TRIVIAL(error) << "genomeLen can't be < 1";
 		return false;
 	}
 
 	if (popSize < 5) 
 	{
-    	BOOST_LOG_TRIVIAL(error) << "The population size must be at least 5.";
+    	//BOOST_LOG_TRIVIAL(error) << "The population size must be at least 5.";
   		return false;
   	}
 
   	if(iterations < 1)
 	{
-		BOOST_LOG_TRIVIAL(error) << "iterations can't be < 1";
+		//BOOST_LOG_TRIVIAL(error) << "iterations can't be < 1";
 		return false;
 	}
 
 	if(!genomeMin)
 	{
-		BOOST_LOG_TRIVIAL(info) << "initialising genomeMin by default to array with genomeLen*codonMin " << genomeLen << " * " << codonMin;
+		//BOOST_LOG_TRIVIAL(info) << "initialising genomeMin by default to array with genomeLen*codonMin " << genomeLen << " * " << codonMin;
 		genomeMin = NULL;
 		genomeMin = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
 
 		if(!genomeMin)
 		{
-			BOOST_LOG_TRIVIAL(error) << "cannot allocate space for genomeMin";
+			//BOOST_LOG_TRIVIAL(error) << "cannot allocate space for genomeMin";
 			exit(-1);
 		}
 
@@ -123,7 +123,7 @@ bool GA::check()
 
 	if(!genomeMax)
 	{
-		BOOST_LOG_TRIVIAL(info) << "initialising genomeMax by default to array with genomeLen*codonMax " << genomeLen << " * " << codonMax;
+		//BOOST_LOG_TRIVIAL(info) << "initialising genomeMax by default to array with genomeLen*codonMax " << genomeLen << " * " << codonMax;
 		genomeMax = NULL;
 
 		genomeMax = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
@@ -134,37 +134,37 @@ bool GA::check()
 
 		if(!genomeMax)
 		{
-			BOOST_LOG_TRIVIAL(error) << "cannot allocate space for genomeMax";
+			//BOOST_LOG_TRIVIAL(error) << "cannot allocate space for genomeMax";
 			exit(-1);
 		}
 	}
 
 	if(!suggestions && (suggestions_count > 0))
 	{
-		BOOST_LOG_TRIVIAL(error) << "suggestions is NULL but suggestions_count > 0";
+		//BOOST_LOG_TRIVIAL(error) << "suggestions is NULL but suggestions_count > 0";
 		return false;
 	}
 
 	if(suggestions && (suggestions_count < 1))
 	{
-		BOOST_LOG_TRIVIAL(warning) << "suggestions is given but suggestions_count < 1 so suggestions is not used";
+		//BOOST_LOG_TRIVIAL(warning) << "suggestions is given but suggestions_count < 1 so suggestions is not used";
 	}
 
 	if(elitism > popSize)
 	{
-		BOOST_LOG_TRIVIAL(error) << "popSize must be greater than elitism";
+		//BOOST_LOG_TRIVIAL(error) << "popSize must be greater than elitism";
 		return false;
 	}
 
 	if(elitism < 0)
 	{
-		BOOST_LOG_TRIVIAL(error) << "elitism must be at least 0";
+		//BOOST_LOG_TRIVIAL(error) << "elitism must be at least 0";
 		return false;
 	}
 
 	if((mutationChance < 0) | (mutationChance > 1))
 	{
-		BOOST_LOG_TRIVIAL(error) << "mutationChance must be between 0 and 1";
+		//BOOST_LOG_TRIVIAL(error) << "mutationChance must be between 0 and 1";
 		return false;
 	}
 
@@ -172,30 +172,30 @@ bool GA::check()
 
 	if(!monitorFunc)
 	{
-		BOOST_LOG_TRIVIAL(warning) << "no monitor function given";
+		//BOOST_LOG_TRIVIAL(warning) << "no monitor function given";
 	}
 
 	if(!evalFunc)
 	{
-		BOOST_LOG_TRIVIAL(error) << "no evaluation function defined";
+		//BOOST_LOG_TRIVIAL(error) << "no evaluation function defined";
 		return false;
 	}
 
 	if(!selectionFunc)
 	{
-		BOOST_LOG_TRIVIAL(info) << "no selection function defined, using the default one";
+		//BOOST_LOG_TRIVIAL(info) << "no selection function defined, using the default one";
 		selectionFunc = default_selection;
 	}
 
 	if(!crossoverFunc)
 	{
-		BOOST_LOG_TRIVIAL(info) << "no crossover function defined, using the default one";
+		//BOOST_LOG_TRIVIAL(info) << "no crossover function defined, using the default one";
 		crossoverFunc = default_crossover;
 	}
 
 	if(!mutationFunc)
 	{
-		BOOST_LOG_TRIVIAL(info) << "no mutation function defined, using the default one";
+		//BOOST_LOG_TRIVIAL(info) << "no mutation function defined, using the default one";
 		mutationFunc = default_mutation;
 	}
 
@@ -207,11 +207,11 @@ bool GA::check()
 
 ga_result* GA::solve()
 {
-	BOOST_LOG_TRIVIAL(info) << "solving the GA";
+	//BOOST_LOG_TRIVIAL(info) << "solving the GA";
 
 	start_time = time(NULL);
 
-	BOOST_LOG_TRIVIAL(info) << "started solving at " << start_time;
+	//BOOST_LOG_TRIVIAL(info) << "started solving at " << start_time;
 
 
 	///////////////////////////////////////////////////////////// INIT
@@ -243,7 +243,7 @@ ga_result* GA::solve()
 
 	if(!newPopulation)
 	{
-		BOOST_LOG_TRIVIAL(error) << "can't allocate the new population";
+		//BOOST_LOG_TRIVIAL(error) << "can't allocate the new population";
 		exit(-1);
 	}
 
@@ -262,14 +262,14 @@ ga_result* GA::solve()
 
 	for(iter = 0; iter < iterations; iter++)
 	{
-		BOOST_LOG_TRIVIAL(info) << "starting iteration " << iter + 1;
+		//BOOST_LOG_TRIVIAL(info) << "starting iteration " << iter + 1;
 		
 
 		//std::cout << iter << std::endl;
 
 		////////////////// Evaluation
 
-		BOOST_LOG_TRIVIAL(info) << "calculating evaluation values";
+		//BOOST_LOG_TRIVIAL(info) << "calculating evaluation values";
 		
 		/*std::cout << iter << std::endl;
 		checkCoords();
@@ -278,20 +278,20 @@ ga_result* GA::solve()
 		for(int chromo = 0; chromo < popSize; chromo++)
 			evalVals[chromo] = population[chromo]->get_cost();
 
-		BOOST_LOG_TRIVIAL(info) << "extracting some statistics";
+		//BOOST_LOG_TRIVIAL(info) << "extracting some statistics";
 
 		float *minEval = std::min_element(evalVals, evalVals + popSize);
 
 		bestEvals[iter] = *minEval;
-		BOOST_LOG_TRIVIAL(info) << "best cost in this iteration = " << bestEvals[iter];
+		//BOOST_LOG_TRIVIAL(info) << "best cost in this iteration = " << bestEvals[iter];
 
 		meanEvals[iter] = (std::accumulate(evalVals, evalVals + popSize, meanEvals[iter])) / popSize;
-		BOOST_LOG_TRIVIAL(info) << "mean in this iteration = " << meanEvals[iter];
+		//BOOST_LOG_TRIVIAL(info) << "mean in this iteration = " << meanEvals[iter];
 	
 		bestInd = minEval - evalVals;
 
-		BOOST_LOG_TRIVIAL(info) << "best cost in index = " << bestInd;
-		BOOST_LOG_TRIVIAL(info) << "Done.";
+		//BOOST_LOG_TRIVIAL(info) << "best cost in index = " << bestInd;
+		//BOOST_LOG_TRIVIAL(info) << "Done.";
 
 		//set the best cost
 		if(best_cost_set)
@@ -336,23 +336,23 @@ ga_result* GA::solve()
 
 		
 	//////////////////////////////////////////////////////////// Selection
-		BOOST_LOG_TRIVIAL(info) << "applying selection";
+		//BOOST_LOG_TRIVIAL(info) << "applying selection";
 
 		/*sortedPopulation = */selectionFunc(population, popSize);
 
 
-		BOOST_LOG_TRIVIAL(debug) << "the elite members";
+		//BOOST_LOG_TRIVIAL(debug) << "the elite members";
 
 		//apply elitism
 		for (int i = 0; i < elitism; ++i)
 		{
 			newPopulation[i] = new genome(population[i]);
-			BOOST_LOG_TRIVIAL(debug) << *newPopulation[i];
+			//BOOST_LOG_TRIVIAL(debug) << *newPopulation[i];
 		}
 
 
 	//////////////////////////////////////////////////////////// Crossover
-		BOOST_LOG_TRIVIAL(info) << "applying crossover";
+		//BOOST_LOG_TRIVIAL(info) << "applying crossover";
 
 		/*std::cout << iter << std::endl;
 		checkCoords();
@@ -378,22 +378,22 @@ ga_result* GA::solve()
 			/*parentInd = (int*)malloc(sizeof(int) * 2);
 			parentInd[0] = population[child]->chromo()[0];
 			parentInd[1] = population[child]->chromo()[1];*/
-			//BOOST_LOG_TRIVIAL(debug) << "ok here 1 " << child;
+			////BOOST_LOG_TRIVIAL(debug) << "ok here 1 " << child;
 			GA_h::ProbSampleNoReplace(popSize, parentProb, 2, parentInd);
-			//BOOST_LOG_TRIVIAL(debug) << "ok here 2 " << child;
+			////BOOST_LOG_TRIVIAL(debug) << "ok here 2 " << child;
 
 			parentProb[0] = parentProb[0] - popSize - 1;
 			parentProb[1] = parentProb[1] - popSize - 1;
 
 			if((parentInd[0] >= popSize || (parentInd[0] < 0)) || (parentInd[1] >= popSize || (parentInd[1] < 0)))
 			{
-				BOOST_LOG_TRIVIAL(error) << "error in parent indexes = " << parentInd[0] << " " << parentInd[0];
+				//BOOST_LOG_TRIVIAL(error) << "error in parent indexes = " << parentInd[0] << " " << parentInd[0];
 				exit(-1);
 			}
 			//std::cout << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
 
-			BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
-			//BOOST_LOG_TRIVIAL(info) << "seed = " << seed << std::endl; 
+			//BOOST_LOG_TRIVIAL(info) << "crossover between parent " << parentInd[0] << " with cost " << population[parentInd[0]]->get_cost() << " and parent " << parentInd[1] << " with cost " << population[parentInd[1]]->get_cost() << " from the sorted population where ind 0 is " << population[0]->get_cost() << std::endl; 
+			////BOOST_LOG_TRIVIAL(info) << "seed = " << seed << std::endl; 
 		
 			int *son = crossoverFunc((population[parentInd[0]])->chromo(), (population[parentInd[1]])->chromo(), genomeLen);
 
@@ -411,7 +411,7 @@ ga_result* GA::solve()
 
 		for (int i = 0; i < popSize; ++i)
 		{
-			//BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
+			////BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
 			delete population[i];
 			population[i] = NULL;
 			//sortedPopulation[i] = NULL;
@@ -421,7 +421,7 @@ ga_result* GA::solve()
 
 		for (int i = 0; i < popSize; ++i)
 		{
-			//BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
+			////BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
 			newPopulation[i] = NULL;
 			//sortedPopulation[i] = NULL;
 		}
@@ -429,7 +429,7 @@ ga_result* GA::solve()
 	//repair some chromosomes
 		if(!allowrepeat)
 		{
-			BOOST_LOG_TRIVIAL(info) << "repairing some chromosomes ";
+			//BOOST_LOG_TRIVIAL(info) << "repairing some chromosomes ";
 			for (int child = elitism; child < popSize; ++child)
 			{
 				GA_h::unique_chromo(population[child]->chromo(), genomeMin, genomeMax, genomeLen);
@@ -440,7 +440,7 @@ ga_result* GA::solve()
 
 		if(mutationChance > 0)
 		{
-			BOOST_LOG_TRIVIAL(info) << "applying Mutation...";
+			//BOOST_LOG_TRIVIAL(info) << "applying Mutation...";
 			double dampening_factor;
 			
 
@@ -453,10 +453,10 @@ ga_result* GA::solve()
 			}
 		}
 
-		BOOST_LOG_TRIVIAL(info) << "new population";
+		//BOOST_LOG_TRIVIAL(info) << "new population";
 		for (int i = 0; i < popSize; ++i)
 		{
-			BOOST_LOG_TRIVIAL(info) << *population[i];
+			//BOOST_LOG_TRIVIAL(info) << *population[i];
 		}
 
 		//sleep(2);
@@ -468,7 +468,7 @@ ga_result* GA::solve()
 			//delete allocated vars
 			for (int i = 0; i < popSize; ++i)
 			{
-				//BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
+				////BOOST_LOG_TRIVIAL(info) << "delete=" << population[i] << " " << iter;
 				delete population[i];
 				population[i] = NULL;
 				//sortedPopulation[i] = NULL;
@@ -487,21 +487,21 @@ ga_result* GA::solve()
 
 	}
 
-	BOOST_LOG_TRIVIAL(info) << "end of generations iteration reached";
+	//BOOST_LOG_TRIVIAL(info) << "end of generations iteration reached";
 
 	if(!elitism)
 	{
-		BOOST_LOG_TRIVIAL(info) << "recalculating evaluation values because of elitism = 0";
+		//BOOST_LOG_TRIVIAL(info) << "recalculating evaluation values because of elitism = 0";
 		
 		for(int chromo = 0; chromo < popSize; chromo++)
 			evalVals[chromo] = population[chromo]->get_cost();
 
-		BOOST_LOG_TRIVIAL(info) << "extracting some statistics";
+		//BOOST_LOG_TRIVIAL(info) << "extracting some statistics";
 
 		float *minEval = std::min_element(evalVals, evalVals + popSize);
 
 		bestEvals[iter] = *minEval;
-		BOOST_LOG_TRIVIAL(info) << "best cost in this iteration = " << bestEvals[iter];
+		//BOOST_LOG_TRIVIAL(info) << "best cost in this iteration = " << bestEvals[iter];
 	
 		bestInd = minEval - evalVals;
 	}
@@ -516,13 +516,13 @@ ga_result* GA::solve()
 
 void GA::init(genome **& population)
 {
-	BOOST_LOG_TRIVIAL(info) << "initialising population ...";
+	//BOOST_LOG_TRIVIAL(info) << "initialising population ...";
 	//create population
 	population = new genome*[popSize];//(genome**)malloc(sizeof(genome*) * popSize);
 
 	if(!population)
 	{
-		BOOST_LOG_TRIVIAL(error) << "can't allocate population";
+		//BOOST_LOG_TRIVIAL(error) << "can't allocate population";
 		exit(-1);
 	}
 
@@ -541,7 +541,7 @@ void GA::init(genome **& population)
 	//init the population with the given suggestions or by random chromosomes
 	if(suggestions && (suggestions_count > 0))
 	{
-		BOOST_LOG_TRIVIAL(info) << "filling initial population with the given suggestions ...";
+		//BOOST_LOG_TRIVIAL(info) << "filling initial population with the given suggestions ...";
 		for(int i = 0; i < suggestions_count; i++)
 		{
 			population[pop_cursor++] = new genome(suggestions[i]);
@@ -549,14 +549,14 @@ void GA::init(genome **& population)
 	}
 	else
 	{
-		BOOST_LOG_TRIVIAL(info) << "no suggestions given, filling initial population with random genomes ...";
+		//BOOST_LOG_TRIVIAL(info) << "no suggestions given, filling initial population with random genomes ...";
 		for(int i = 0; i < popSize; i++)
 			population[pop_cursor++] = new genome();
 	}
 
 	if(pop_cursor != popSize)
 	{
-		BOOST_LOG_TRIVIAL(info) << "fillingthe rest of initial population with " << popSize - pop_cursor << " random genomes ...";
+		//BOOST_LOG_TRIVIAL(info) << "fillingthe rest of initial population with " << popSize - pop_cursor << " random genomes ...";
 		for(int i = pop_cursor; i < popSize; i++)
 			population[pop_cursor++] = new genome();
 	}
@@ -584,7 +584,7 @@ ga_result* GA::collect(genome* bestGen, int iter)
 
 void GA::print()
 {
-	BOOST_LOG_TRIVIAL(info) << "finished with these results: ";
+	//BOOST_LOG_TRIVIAL(info) << "finished with these results: ";
 
 	using namespace std;
 

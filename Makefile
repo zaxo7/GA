@@ -1,7 +1,7 @@
 MAKEFLAGS += -j4
 
 
-LIBS =  -lboost_log -lboost_log_setup  -lboost_system -lboost_thread -lpthread 
+LIBS =  #-lboost_log -lboost_log_setup  -lboost_system -lboost_thread -lpthread 
 #MUTATION_1 is the default mutation using a dampening_factor
 #USE_SWAP_MUTATION is used to remove duplicates
 DEFINES = -DUSE_SWAP_MUTATION #-DMUTATION_1

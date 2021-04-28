@@ -8,7 +8,7 @@ string TSP::default_root = string("./benchmarks/");
 
 TSP::TSP()
 {
-    BOOST_LOG_TRIVIAL(debug) << "constructor 1 called";	
+    //BOOST_LOG_TRIVIAL(debug) << "constructor 1 called";	
     benchName = NULL;
 	benchPath = NULL;
     
@@ -49,7 +49,7 @@ TSP::TSP()
 
 TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, bool fullPath) : TSP()
 {
-    BOOST_LOG_TRIVIAL(debug) << "constructor 2 called"; 
+    //BOOST_LOG_TRIVIAL(debug) << "constructor 2 called"; 
     cout << endl << "bench : " << benchmark << endl << "popSize : " << popSize << endl << "iterations : " << iterations << endl << "mutationChance : " << mutationChance << endl;
     if(fullPath)
         coordsMatrix = load(benchmark);
@@ -69,13 +69,13 @@ TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, bo
 
 TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, GA_type solve_type, bool fullPath) : TSP(benchmark, popSize, iterations, mutationChance, fullPath)
 {
-    BOOST_LOG_TRIVIAL(debug) << "constructor 3 called"; 
+    //BOOST_LOG_TRIVIAL(debug) << "constructor 3 called"; 
     this->solve_type = solve_type;
 }
 
 TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, GA_type solve_type, monitor monitorFunc, eval evalFunc, selection selectionFunc, crossover crossoverFunc, mutation mutationFunc, bool fullPath) : TSP(benchmark, popSize, iterations, mutationChance, solve_type, fullPath)
 {
-    BOOST_LOG_TRIVIAL(debug) << "constructor 4 called"; 
+    //BOOST_LOG_TRIVIAL(debug) << "constructor 4 called"; 
     this->monitorFunc = monitorFunc;
     this->evalFunc = evalFunc;
     this->selectionFunc = selectionFunc;
@@ -104,42 +104,42 @@ ga_result* TSP::solve(GA_type solve_type)
 
     result = GA_engine->solve();
     
-    print(false);
+    print(log);
     //print();
     return result;
 }
 
 bool TSP::check()
 {
-    BOOST_LOG_TRIVIAL(info) << "checking TSP parameters ...";
+    //BOOST_LOG_TRIVIAL(info) << "checking TSP parameters ...";
    
     if (popSize < 5) 
     {
-        BOOST_LOG_TRIVIAL(error) << "The population size must be at least 5.";
+        //BOOST_LOG_TRIVIAL(error) << "The population size must be at least 5.";
         return false;
     }
 
     if(iterations < 1)
     {
-        BOOST_LOG_TRIVIAL(error) << "iterations can't be < 1";
+        //BOOST_LOG_TRIVIAL(error) << "iterations can't be < 1";
         return false;
     }
 
     if((mutationChance < 0) | (mutationChance > 1))
     {
-        BOOST_LOG_TRIVIAL(error) << "mutationChance must be between 0 and 1";
+        //BOOST_LOG_TRIVIAL(error) << "mutationChance must be between 0 and 1";
         return false;
     }
 
     if(benchSize < 0)
     {
-        BOOST_LOG_TRIVIAL(error) << "benchmark size not valid, check the benchmark file format";
+        //BOOST_LOG_TRIVIAL(error) << "benchmark size not valid, check the benchmark file format";
         return false;
     }
 
     if(solve_type == NONE)
     {
-        BOOST_LOG_TRIVIAL(error) << "you must specify a solving technique for ex: NSE_NN";
+        //BOOST_LOG_TRIVIAL(error) << "you must specify a solving technique for ex: NSE_NN";
         return false;
     }
 
@@ -148,7 +148,7 @@ bool TSP::check()
 
 GA* TSP::init_engine()
 {
-    BOOST_LOG_TRIVIAL(debug) << "initialising engine"; 
+    //BOOST_LOG_TRIVIAL(debug) << "initialising engine"; 
     GA* engine;
 
     engine = new GA(genomeLen, codonMin, codonMax, NULL, NULL, initial, initial_count, popSize, iterations, termination_cost, true, mutationChance, elitism, monitorFunc, evalFunc, selectionFunc, crossoverFunc, mutationFunc, allowrepeat, false, verbose);
@@ -217,7 +217,7 @@ void TSP::prepare_parameters()
             initial = new int*;//(int**)malloc(sizeof(int*));
             initial[0] = ANN();
             initial_count = 1;
-            BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
+            //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
         }
     }
 
@@ -226,14 +226,14 @@ void TSP::prepare_parameters()
 
 float** TSP::loadBench(string benchmark, string root)
 {
-    BOOST_LOG_TRIVIAL(debug) << "loading bench : " << benchmark;
+    //BOOST_LOG_TRIVIAL(debug) << "loading bench : " << benchmark;
 	if(!benchName)
         benchName = new string(benchmark.c_str());
 
     if(!benchPath)
 	   benchmark = root.append(benchmark).append(".tsp");
 
-    BOOST_LOG_TRIVIAL(debug) << "created full path " << benchmark ;
+    //BOOST_LOG_TRIVIAL(debug) << "created full path " << benchmark ;
 
     benchPath = new string(benchmark.c_str());
 
@@ -243,7 +243,7 @@ float** TSP::loadBench(string benchmark, string root)
 
 float** TSP::load(string benchmark)
 {
-    BOOST_LOG_TRIVIAL(debug) << "loading benchmark"; 
+    //BOOST_LOG_TRIVIAL(debug) << "loading benchmark"; 
     //extract name
     if(!benchName)
     {
@@ -263,7 +263,7 @@ float** TSP::load(string benchmark)
         if(index != -1)
             benchName->erase(index);
 
-        BOOST_LOG_TRIVIAL(debug) << "got file name " << *benchName << " from " << *benchPath;
+        //BOOST_LOG_TRIVIAL(debug) << "got file name " << *benchName << " from " << *benchPath;
     }
 
 	//coordinates matrix
@@ -276,7 +276,7 @@ float** TSP::load(string benchmark)
 
     if(!benchFile.good())
     {
-        BOOST_LOG_TRIVIAL(error) << "benchmark file " << benchmark << " dosn't exist";
+        //BOOST_LOG_TRIVIAL(error) << "benchmark file " << benchmark << " dosn't exist";
         exit(-1);
     }
     else
@@ -300,7 +300,7 @@ float** TSP::load(string benchmark)
         //close the file
         benchFile.close();
 
-        BOOST_LOG_TRIVIAL(debug) << "benchmark file " << benchmark << " with size " << fileSize ;
+        //BOOST_LOG_TRIVIAL(debug) << "benchmark file " << benchmark << " with size " << fileSize ;
 
         //regex to match bench size
         regex regBenchSize("N\\s*:\\s*(\\d+)", regex_constants::ECMAScript);
@@ -318,17 +318,17 @@ float** TSP::load(string benchmark)
         	//convert it to int
            	benchSize = stoi(matches[1]);
 
-           	BOOST_LOG_TRIVIAL(info) << "found benchmark size " << benchSize << " in " << matches[1];
+           	//BOOST_LOG_TRIVIAL(info) << "found benchmark size " << benchSize << " in " << matches[1];
         }
         else
         {
-        	BOOST_LOG_TRIVIAL(error) << "can't parse benchmark size from file " << benchmark;
+        	//BOOST_LOG_TRIVIAL(error) << "can't parse benchmark size from file " << benchmark;
         	//exit imidiately
         	exit(-1);
         }
 
         //alloc the matrix n*2 
-        BOOST_LOG_TRIVIAL(debug) << "allocating coordsMatrix with " << benchSize << " * " << 2;
+        //BOOST_LOG_TRIVIAL(debug) << "allocating coordsMatrix with " << benchSize << " * " << 2;
         coordsMat = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
 
         for(int i = 0; i < benchSize; i++)
@@ -355,7 +355,7 @@ float** TSP::load(string benchmark)
 	           	coordsMat[i][0] =  stof(matches[1]);
                	coordsMat[i++][1] =  stof(matches[2]);
 
-	           	BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
+	           	//BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
 	        }
 	        
         }
@@ -366,7 +366,7 @@ float** TSP::load(string benchmark)
 
 float** TSP::getWeights()
 {
-    BOOST_LOG_TRIVIAL(debug) << "getWeights called";
+    //BOOST_LOG_TRIVIAL(debug) << "getWeights called";
     
     float **weightsMat = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
     
@@ -388,14 +388,14 @@ float** TSP::getWeights()
         }
     }
 
-    for (int i = 0; i < genome::size(); ++i)
+    /*for (int i = 0; i < genome::size(); ++i)
     {
         std::cout << std::endl << i << " : ";
         for (int j = 0; j < genome::size(); ++j)
         {
                 std::cout << (int)weightsMat[i][j] << ", ";
         }
-    }
+    }*/
 
     return weightsMat;
 }
@@ -403,7 +403,7 @@ float** TSP::getWeights()
 
 int* TSP::ANN(float **coords)
 {
-    BOOST_LOG_TRIVIAL(debug) << "ANN called bs = " << benchSize;
+    //BOOST_LOG_TRIVIAL(debug) << "ANN called bs = " << benchSize;
 
     if(genomeLen == -1)
         genomeLen = benchSize;
@@ -557,7 +557,7 @@ int TSP::nth(int row, int n, bool min, bool index_track)
 
 void TSP::setDefaultRoot(string root)
 {
-    BOOST_LOG_TRIVIAL(debug) << "setting default benchmarks root to " << root; 
+    //BOOST_LOG_TRIVIAL(debug) << "setting default benchmarks root to " << root; 
     default_root = root;
 }
 
@@ -611,7 +611,7 @@ void TSP::setLogging(bool l)
 
 TSP::~TSP()
 {
-    BOOST_LOG_TRIVIAL(debug) << "destructing TSP object";
+    //BOOST_LOG_TRIVIAL(debug) << "destructing TSP object";
     //checkCoords();
 
     delete benchName;
@@ -624,8 +624,8 @@ TSP::~TSP()
 
     for (int i = 0; i < benchSize; ++i)
     {   
-        BOOST_LOG_TRIVIAL(debug) << "deleting coordsMatrix[" << i << "] :" << coordsMatrix[i];
-        std::cout << coordsMatrix[i][0] << " , " << coordsMatrix[i][1] << std::endl;
+        //BOOST_LOG_TRIVIAL(debug) << "deleting coordsMatrix[" << i << "] :" << coordsMatrix[i];
+        //std::cout << coordsMatrix[i][0] << " , " << coordsMatrix[i][1] << std::endl;
         delete[] coordsMatrix[i];
         coordsMatrix[i] = NULL;
         delete[] weightsMatrix[i];
@@ -641,7 +641,7 @@ TSP::~TSP()
     {
         delete[] initial[i];
         initial[i] = NULL;
-        //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
+        ////BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
 
     }
 
@@ -651,9 +651,10 @@ TSP::~TSP()
     delete termination_cost;
     termination_cost = NULL;
 
-    free_weights();
+    //free_weights();
 
     delete[] v;
+    v = NULL;
 }
 
 

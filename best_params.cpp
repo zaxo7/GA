@@ -113,26 +113,19 @@ int main(int argc, char const *argv[])
 				solver = NULL;
 			}
 
-
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
-			cout << "ok" << endl;
 
-			results[j] = solver->solve(SIMPLE_RND);
+			results[j] = solver->solve(SIMPLE_NN);
 			
-
-			cout << "brrrr" << endl;
 
 			if(j == 0 || (results[j]->best_genome.cost < min_cost))
 			{
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 
-			//delete solver;
-
-			//exit(1);
 		}
 		
 		cout << "results for benchmark" << bench << "with SIMPLE_NN" << endl;
@@ -192,7 +185,7 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 		}
 
 		cout << "results for benchmark" << bench << "with SIMPLE_RND" << endl;
@@ -253,7 +246,7 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 		}
 
 		cout << "results for benchmark" << bench << "with DC_NN" << endl;
@@ -313,7 +306,7 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 		}
 		cout << "results for benchmark" << bench << "with DC_RND" << endl;
 
@@ -373,7 +366,7 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 		}
 
 
@@ -434,7 +427,7 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
 		}
 
 		cout << "results for benchmark" << bench << "with NSE_RND" << endl;
