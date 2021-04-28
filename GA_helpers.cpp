@@ -22,8 +22,8 @@ void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 
 	//int iv = 0;
 
-	//BOOST_LOG_TRIVIAL(info) << "unique chromo called";
-	////BOOST_LOG_TRIVIAL(debug) << "before unique";
+	BOOST_LOG_TRIVIAL(info) << "unique chromo called";
+	//BOOST_LOG_TRIVIAL(debug) << "before unique";
 	//delete (new genome(chromo));
 	//check for duplicates in the chromosome
 	int ind;
@@ -49,7 +49,7 @@ void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 		if(chromo[ind] > genMax[ind])
 			chromo[ind] = genMin[ind];
 	}
-	////BOOST_LOG_TRIVIAL(debug) << "after unique";
+	//BOOST_LOG_TRIVIAL(debug) << "after unique";
 	//delete (new genome(chromo));
 }
 
@@ -81,7 +81,7 @@ double* GA_h::dnorm(int min, int max)
 
 int GA_h::dup(int *arr, int n)
 {
-	////BOOST_LOG_TRIVIAL(info) << "dup called";
+	//BOOST_LOG_TRIVIAL(info) << "dup called";
     int duplicate = -1;
 
     std::cout << std::endl << "i got this chromo :";
@@ -179,7 +179,7 @@ int *perm = NULL;
 void GA_h::ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans)
 {
-	//BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
+	BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
 
 	if(!p && !perm)
 	{
@@ -207,7 +207,7 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	
 
 	
-	////BOOST_LOG_TRIVIAL(debug) << "ok here 1.0";
+	//BOOST_LOG_TRIVIAL(debug) << "ok here 1.0";
 
 	/* Record element identities */
 	for (i = 0; i < n; i++)
@@ -315,7 +315,7 @@ int *GA_h::sample(int min_k, int k, int n, bool replace)
 	{	
 		if (n > (k - min_k + 1)) 
 		{
-	        //BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
+	        BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
 	        return NULL;
       	}
 		int *tmp = new int[n];//(int*)malloc(sizeof(int) * n);

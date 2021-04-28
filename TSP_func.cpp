@@ -4,7 +4,7 @@ float** weights;
 
 float default_eval_simple(int* chromosome)
 {
-	////BOOST_LOG_TRIVIAL(info) << "evaluation function called";
+	//BOOST_LOG_TRIVIAL(info) << "evaluation function called";
 	/*float cost = 0;
 	for (int i = 0; i < genome::size(); ++i)
 	{
@@ -27,7 +27,7 @@ float default_eval_nse(int* chromosome)
 
 float eval_tour(int *chromosome)
 {
-	//BOOST_LOG_TRIVIAL(debug) << "eval_tour called";	
+	BOOST_LOG_TRIVIAL(debug) << "eval_tour called";	
 
 	float cost = 0;
   
@@ -39,7 +39,7 @@ float eval_tour(int *chromosome)
 		cost += weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
 	}
 
-	//BOOST_LOG_TRIVIAL(debug) << "eval cost : " << cost;
+	BOOST_LOG_TRIVIAL(debug) << "eval cost : " << cost;
 	if(cost < 0)
 	{
 		std::cout << "gen size : " << genome::size() << std::endl;
@@ -72,7 +72,7 @@ float eval_tour(int *chromosome)
 
 void set_weights(float** w)
 {
-	//BOOST_LOG_TRIVIAL(debug) << "set_weights called genome size = " << genome::size();	
+	BOOST_LOG_TRIVIAL(debug) << "set_weights called genome size = " << genome::size();	
 	weights = w;
 	for (int i = 0; i < genome::size(); ++i)
 	{
