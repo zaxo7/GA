@@ -1,4 +1,4 @@
-MAKEFLAGS += -j1
+MAKEFLAGS += -j4
 
 
 LIBS =  -lboost_log -lboost_log_setup  -lboost_system -lboost_thread -lpthread 
@@ -16,9 +16,9 @@ CFlags = -g -Wall
 OBJDIR := ./obj/
 GA_lib_obj := $(addprefix $(OBJDIR)/, GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o)
 
-all: | clear GA_lib  TSP.o test test2 best_params
+all: | clear test test2 best_params
 
-GA_lib: GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o
+GA_lib: | GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o
 
 GA.o:
 	$(CC) $(CFlags) $(DEFINES) -c GA.cpp -o obj/GA.o
@@ -46,7 +46,7 @@ TSP_func.o:
 	$(CC) $(CFlags) $(DEFINES) -c TSP_func.cpp -o obj/TSP_func.o
 
 
-test: test.o
+test: test.o GA_lib TSP.o
 	$(CC) $(CFlags) $(OPT) obj/test.o obj/TSP.o obj/TSP_func.o obj/GA.o obj/genome.o obj/GA_functions.o obj/gen_functions.o obj/GA_helpers.o $(LIBS) -o release/test
 	@#@$(CC) $(OPT) $(DEFINES) obj/test.o obj/GA.o obj/genome.o obj/GA_functions.o obj/gen_functions.o $(LIBS) -o debug/test
 	@#@release/test
@@ -55,14 +55,14 @@ test.o:
 	$(CC) $(CFlags) $(DEFINES) -c test.cpp -o obj/test.o
 
 
-test2: test2.o
+test2: test2.o GA_lib TSP.o
 	@#$(CC) $(CFlags) $(OPT) $(DEFINES) obj/test2.o -o release/test2
 	$(CC) $(CFlags) $(OPT) obj/test2.o obj/TSP.o obj/TSP_func.o obj/GA.o obj/genome.o obj/GA_functions.o obj/gen_functions.o obj/GA_helpers.o $(LIBS) -o release/test2
 
 test2.o:
 	$(CC) $(CFlags) $(DEFINES) -c test2.cpp -o obj/test2.o
 
-best_params: best_params.o
+best_params: best_params.o GA_lib TSP.o
 	$(CC) $(CFlags) $(OPT) obj/best_params.o obj/TSP.o obj/TSP_func.o obj/GA.o obj/genome.o obj/GA_functions.o obj/gen_functions.o obj/GA_helpers.o $(LIBS) -o release/best_params
 
 

@@ -1,6 +1,6 @@
 #include "genome.h" 
 
-int genome::chromoSize;
+int genome::chromoSize = -1;
 
 std::default_random_engine genome::generator;
 
@@ -15,7 +15,7 @@ eval genome::eval_func;
 genome::genome(int *chromo)
 {
 	chromosome = NULL;
-	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
+	BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
 	chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
@@ -30,7 +30,7 @@ genome::genome(int *chromo)
 genome::genome(genome *&gen)
 {
 	this->chromosome = NULL;
-	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
+	BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
 	this->chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{

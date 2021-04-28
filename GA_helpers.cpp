@@ -170,15 +170,18 @@ static void revsort(double *a, int *ib, int n)
 void GA_h::ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans)
 {
+	BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
    	static double *p = NULL;
    	static int *perm = NULL;
 	if(!random_engine && !get_rand)
 	{
-		random_engine = new std::mt19937(random_device());
+		/*random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
 
-		random_engine->seed(time(NULL));
+		random_engine->seed(time(NULL));*/
+
+		srand48(time(NULL));
 
 		p = new double[n];//(double*)malloc(sizeof(double) * n);
 
@@ -193,9 +196,10 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	double rT, mass, totalmass;
 	int i, j, k, n1;
 
-	//srand48(seed);
+	
 
 	
+	//BOOST_LOG_TRIVIAL(debug) << "ok here 1.0";
 
 	/* Record element identities */
 	for (i = 0; i < n; i++)
@@ -222,7 +226,7 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	/* Compute the sample */
 	totalmass = 1;
 	for (i = 0, n1 = n - 1; i < nans; i++, n1--) {
-	rT = totalmass * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+	rT = totalmass * (((float) rand())/((float) RAND_MAX));//((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
 	mass = 0;
 	for (j = 0; j < n1; j++) {
 	  mass += p[j];

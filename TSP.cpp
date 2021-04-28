@@ -55,7 +55,7 @@ TSP::TSP(string benchmark, int popSize, int iterations, float mutationChance, bo
         coordsMatrix = loadBench(benchmark);
 
     //calculate the arcs weights
-    wheightsMatrix = getWeights();
+    weightsMatrix = getWeights();
 
     this->popSize = popSize;
     this->iterations = iterations;
@@ -154,7 +154,8 @@ GA* TSP::init_engine()
 void TSP::prepare_parameters()
 {
     //init the weights matrix
-    set_weights(wheightsMatrix);
+    genome::setSize(benchSize);
+    set_weights(weightsMatrix);
 
     bool is_rand_init = false;
 
@@ -210,7 +211,8 @@ void TSP::prepare_parameters()
         {
             initial = new int*;//(int**)malloc(sizeof(int*));
             initial[0] = ANN();
-            initial_count = 1;        
+            initial_count = 1;
+            BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
         }
     }
 
@@ -219,6 +221,7 @@ void TSP::prepare_parameters()
 
 float** TSP::loadBench(string benchmark, string root)
 {
+    BOOST_LOG_TRIVIAL(debug) << "loading bench : " << benchmark;
 	if(!benchName)
         benchName = new string(benchmark);
 
@@ -259,7 +262,7 @@ float** TSP::load(string benchmark)
     }
 
 	//coordinates matrix
-	float** coordsMatrix;
+	float** coordsMat;
 
     //benchmark file
     ifstream benchFile;
@@ -320,11 +323,11 @@ float** TSP::load(string benchmark)
         }
 
         //alloc the matrix n*2 
-        coordsMatrix = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
+        coordsMat = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
 
         for(int i = 0; i < benchSize; i++)
         {
-            coordsMatrix[i] = new float[2];//(float*)malloc(sizeof(float)*2);
+            coordsMat[i] = new float[2];//(float*)malloc(sizeof(float)*2);
         }
 
   
@@ -343,26 +346,26 @@ float** TSP::load(string benchmark)
 	        if(matches.size() == 3)
 	        {	
 	        	//convert it to float   	
-	           	coordsMatrix[i][0] =  stof(matches[1]);
-               	coordsMatrix[i++][1] =  stof(matches[2]);
+	           	coordsMat[i][0] =  stof(matches[1]);
+               	coordsMat[i++][1] =  stof(matches[2]);
 
-	           	//BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMatrix[i-1][0] << ", " << coordsMatrix[i-1][1] << ") in " << line ;
+	           	//BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
 	        }
 	        
         }
     }
 
-	return coordsMatrix;
+	return coordsMat;
 }
 
 float** TSP::getWeights()
 {
     BOOST_LOG_TRIVIAL(debug) << "getWeights called";
     
-    float **wheightsMatrix = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
+    float **weightsMat = new float*[benchSize];//(float**)malloc(sizeof(float*) * benchSize);
     
     for(int i = 0; i < benchSize; i++)
-        wheightsMatrix[i] = new float[benchSize];//(float*)malloc(sizeof(float) * benchSize);
+        weightsMat[i] = new float[benchSize];//(float*)malloc(sizeof(float) * benchSize);
 
     for (int i = 0; i < benchSize; ++i)
     {
@@ -370,25 +373,37 @@ float** TSP::getWeights()
         {
             if(i != j)
             {
-                wheightsMatrix[i][j] = wheightsMatrix[j][i] = sqrt(pow(coordsMatrix[i][0] - coordsMatrix[j][0], 2) + pow(coordsMatrix[i][1] - coordsMatrix[j][1], 2));
-            }   
+                weightsMat[i][j] = weightsMat[j][i] = round(sqrt(pow(coordsMatrix[i][0] - coordsMatrix[j][0], 2) + pow(coordsMatrix[i][1] - coordsMatrix[j][1], 2)));
+            }
+            else
+            {
+                weightsMat[i][j] = 1;
+            }
         }
     }
 
+    for (int i = 0; i < genome::size(); ++i)
+    {
+        std::cout << std::endl << i << " : ";
+        for (int j = 0; j < genome::size(); ++j)
+        {
+                std::cout << (int)weightsMat[i][j] << ", ";
+        }
+    }
 
-    return wheightsMatrix;
+    return weightsMat;
 }
 
 
 int* TSP::ANN(float **coords)
 {
-    BOOST_LOG_TRIVIAL(debug) << "ANN called";
+    BOOST_LOG_TRIVIAL(debug) << "ANN called bs = " << benchSize;
 
     if(genomeLen == -1)
         genomeLen = benchSize;
 
     if(coords == NULL)
-        coords = wheightsMatrix;
+        coords = weightsMatrix;
 
     int* tour = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
     //trouver le max dans la matrice
@@ -417,7 +432,7 @@ int* TSP::ANN(float **coords)
         cout << endl << i << " : ";
         for (int j = 0; j < benchSize; ++j)
         {
-            cout << wheightsMatrix[i][j] << ", ";
+            cout << weightsMatrix[i][j] << ", ";
         }
     }
     cout << endl;*/
@@ -489,9 +504,9 @@ int TSP::nth(int row, int n, bool min, bool index_track)
 
     for (int i = 0; i < benchSize; ++i)
     {
-        v[i] = wheightsMatrix[row][i];
+        v[i] = weightsMatrix[row][i];
         index[i] = i;
-        //printf("%f, ", wheightsMatrix[row][i]);
+        //printf("%f, ", weightsMatrix[row][i]);
     }
 
     //using namespace std::placeholders;
@@ -588,5 +603,39 @@ void TSP::setLogging(bool l)
 
 TSP::~TSP()
 {
+    delete benchName;
+    benchName = NULL;
+    delete benchPath;
+    benchPath = NULL;
+
+    delete GA_engine;
+    GA_engine = NULL;
+
+    for (int i = 0; i < benchSize; ++i)
+    {
+        delete[] coordsMatrix[i];
+        coordsMatrix[i] = NULL;
+        delete[] weightsMatrix[i];
+        weightsMatrix[i] = NULL;
+    }
+    delete[] coordsMatrix;
+    coordsMatrix = NULL;
+    delete[] weightsMatrix;
+    weightsMatrix = NULL;
+
+    
+    for (int i = 0; i < initial_count; ++i)
+    {
+        delete[] initial[i];
+        initial[i] = NULL;
+        //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
+
+    }
+
+    delete[] initial;
+    initial = NULL;
+
+    delete termination_cost;
+    termination_cost = NULL;
 
 }

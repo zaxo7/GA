@@ -1,6 +1,6 @@
 #include "TSP_func.h"
 
-float** wheights;
+float** weights;
 
 float default_eval_simple(int* chromosome)
 {
@@ -36,7 +36,34 @@ float eval_tour(int *chromosome)
   
 	for (int i = 0; i < len ; ++i)
 	{
-		cost += wheights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
+		cost += weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
+	}
+
+	BOOST_LOG_TRIVIAL(debug) << "eval cost : " << cost;
+	if(cost < 0)
+	{
+		std::cout << "gen size : " << genome::size() << std::endl;
+		for (int i = 0; i < genome::size(); ++i)
+		{
+			std::cout << chromosome[i] << ", ";
+		}
+
+		for (int i = 0; i < len ; ++i)
+		{
+			cost += weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
+			std::cout << "++weights["<<chromosome[i] - 1<<"][" << chromosome[(i + 1) % len ] - 1 << "]" << weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
+		}
+
+		std::cout << std::endl;
+		for (int i = 0; i < genome::size(); ++i)
+		{
+			for (int j = 0; j < genome::size(); ++j)
+			{
+				std::cout << weights[i][j] << ", ";
+			}
+			std::cout << std::endl;
+		}
+		exit(-7);
 	}
 
 	return cost; 
@@ -45,6 +72,18 @@ float eval_tour(int *chromosome)
 
 void set_weights(float** w)
 {
-	BOOST_LOG_TRIVIAL(debug) << "set_weights called";	
-	wheights = w;
+	BOOST_LOG_TRIVIAL(debug) << "set_weights called genome size = " << genome::size();	
+	weights = w;
+	for (int i = 0; i < genome::size(); ++i)
+	{
+		for (int j = 0; j < genome::size(); ++j)
+		{
+			if(w[i][j] < 0)
+			{
+				std::cout << "w[" << i << "][" << j << "] = " << w[i][j] << std::endl;
+				exit(-7);
+			}
+		}
+		//std::cout << std::endl;
+	}
 }

@@ -70,7 +70,7 @@ void GA::init_logger()
 {
     BOOST_LOG_TRIVIAL(info) << "initialising logger";
 
-    logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::error);
+    //logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::error);
 }
 
 bool GA::check()
@@ -363,7 +363,9 @@ ga_result* GA::solve()
 			/*parentInd = (int*)malloc(sizeof(int) * 2);
 			parentInd[0] = population[child]->chromo()[0];
 			parentInd[1] = population[child]->chromo()[1];*/
+			//BOOST_LOG_TRIVIAL(debug) << "ok here 1 " << child;
 			GA_h::ProbSampleNoReplace(popSize, parentProb, 2, parentInd);
+			//BOOST_LOG_TRIVIAL(debug) << "ok here 2 " << child;
 
 			parentProb[0] = parentProb[0] - popSize - 1;
 			parentProb[1] = parentProb[1] - popSize - 1;
@@ -374,6 +376,7 @@ ga_result* GA::solve()
 			//BOOST_LOG_TRIVIAL(info) << "seed = " << seed << std::endl; 
 		
 			int *son = crossoverFunc((population[parentInd[0]])->chromo(), (population[parentInd[1]])->chromo(), genomeLen);
+
 
 			newPopulation[child] = new genome(son);
 
@@ -485,15 +488,10 @@ void GA::init(genome **& population)
 	if(suggestions && (suggestions_count > 0))
 	{
 		BOOST_LOG_TRIVIAL(info) << "filling initial population with the given suggestions ...";
-		int *temp_genome = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
-
 		for(int i = 0; i < suggestions_count; i++)
 		{
-			memcpy(temp_genome, suggestions[i], sizeof(int) * genomeLen);
-			population[pop_cursor++] = new genome(temp_genome);
+			population[pop_cursor++] = new genome(suggestions[i]);
 		}
-		delete[] temp_genome;
-		temp_genome = NULL;
 	}
 	else
 	{
@@ -589,7 +587,8 @@ GA::~GA()
 		genomeMin = NULL;
 	}
 
-	if(suggestions)
+	//never delete user pointers
+	/*if(suggestions)
 	{
 		for (int i = 0; i < suggestions_count; ++i)
 		{
@@ -598,7 +597,7 @@ GA::~GA()
 		}
 		delete[] suggestions;
 		suggestions = NULL;
-	}
+	}*/
 
 	if(terminationCost)
 	{

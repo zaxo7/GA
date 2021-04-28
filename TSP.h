@@ -36,14 +36,14 @@ private:
 
 	GA *GA_engine;
 
-	ga_result *result;
+	ga_result *result; // will be returned
 
 	int genomeLen;
 	int codonMin;
 	int codonMax;
 
 	float** coordsMatrix;
-	float** wheightsMatrix;
+	float** weightsMatrix;
 
 	//initial tour matrix
 	int **initial;

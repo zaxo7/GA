@@ -117,7 +117,7 @@ int main(int argc, char const *argv[])
 			solver = new TSP(bench, params[j][0], params[j][1], params[j][2]);
 
 			cout << "ok" << endl;
-			
+
 			results[j] = solver->solve(SIMPLE_NN);
 
 			cout << "brrrr" << endl;
