@@ -179,48 +179,73 @@ void TSP::prepare_parameters()
         if(evalFunc == NULL)
             evalFunc = default_eval_simple;
 
+        set_witness_tour(NULL, benchSize);
+
+        if(!initial)
+        {
+            if(is_rand_init)
+            {
+                initial = new int*;//(int**)malloc(sizeof(int*));
+                initial[0] = GA_h::sample(codonMin, codonMax, genomeLen, allowrepeat);
+                initial_count = 1;
+            }    
+            else
+            {
+                initial = new int*;//(int**)malloc(sizeof(int*));
+                initial[0] = ANN();
+                initial_count = 1;
+                //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
+            }
+        }
     }
     else if(solve_type == DOUBLE_CHROMOSOME_NN || (solve_type == DOUBLE_CHROMOSOME_RND))
     {
         allowrepeat = true;
 
         //int the Double chromosome type the genome len can be whatever > 2 and should be even
-        genomeLen = benchSize;
+        genomeLen = benchSize * 2;
         codonMin = 1;
         codonMax = benchSize;
 
         if(evalFunc == NULL)
             evalFunc = default_eval_dc;
+
+        if(!initial)
+        {
+            if(is_rand_init)
+            {
+                set_witness_tour(GA_h::sample(codonMin, codonMax, benchSize, allowrepeat), benchSize);
+            }    
+            else
+            {
+                set_witness_tour(ANN(), benchSize);
+            }
+        }
     }
     else if(solve_type == NSE_NN || (solve_type == NSE_RND))
     {
         allowrepeat = true;
 
         //int the Node shift encoding type the genome len needs to be benchsize - 1
-        genomeLen = benchSize;
+        genomeLen = benchSize - 1;
         codonMin = 1;
-        codonMax = benchSize;
+        codonMax = benchSize - 2;
 
         if(evalFunc == NULL)
             evalFunc = default_eval_nse;
-    }
-    if(!initial)
-    {
-        if(is_rand_init)
+
+        if(!initial)
         {
-            initial = new int*;//(int**)malloc(sizeof(int*));
-            initial[0] = GA_h::sample(codonMin, codonMax, genomeLen, allowrepeat);
-            initial_count = 1;
-        }    
-        else
-        {
-            initial = new int*;//(int**)malloc(sizeof(int*));
-            initial[0] = ANN();
-            initial_count = 1;
-            //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
+            if(is_rand_init)
+            {
+                set_witness_tour(normalizeTour(GA_h::sample(codonMin, benchSize, benchSize, allowrepeat), benchSize), benchSize);
+            }    
+            else
+            {
+                set_witness_tour(ANN(), benchSize);
+            }
         }
     }
-
 
 }
 

@@ -107,7 +107,7 @@ int main(int argc, char const *argv[])
 
 		int total_time = 0;
 
-		for (int j = 0; j < 64; j++)
+		/*for (int j = 0; j < 64; j++)
 		{
 			if(solver != NULL)
 			{
@@ -127,11 +127,11 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 
 		}
 		
-		cout << "results for benchmark" << bench << "with SIMPLE_NN" << endl;
+		cout << "results for benchmark " << bench << " with SIMPLE_NN" << endl;
 
 		if(i == 0) //small
 		{
@@ -191,10 +191,10 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 		}
 
-		cout << "results for benchmark" << bench << "with SIMPLE_RND" << endl;
+		cout << "results for benchmark " << bench << " with SIMPLE_RND" << endl;
 
 		if(i == 0) //small
 		{
@@ -229,7 +229,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < 64; ++j)
 		{
 			cout << results[j]->best_genome.cost << ", ";
-		}
+		}*/
 
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " DOUBLE_CHROMOSOME_NN" << endl;
@@ -255,10 +255,10 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 		}
 
-		cout << "results for benchmark" << bench << "with DC_NN" << endl;
+		cout << "results for benchmark " << bench << " with DC_NN" << endl;
 
 		if(i == 0) //small
 		{
@@ -318,9 +318,9 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 		}
-		cout << "results for benchmark" << bench << "with DC_RND" << endl;
+		cout << "results for benchmark " << bench << " with DC_RND" << endl;
 
 		if(i == 0) //small
 		{
@@ -381,11 +381,11 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 		}
 
 
-		cout << "results for benchmark" << bench << "with NSE_NN" << endl;
+		cout << "results for benchmark " << bench << " with NSE_NN" << endl;
 
 		if(i == 0) //small
 		{
@@ -445,10 +445,10 @@ int main(int argc, char const *argv[])
 				min_cost = results[j]->best_genome.cost;
 				min_cost_ind = j;
 			}
-			cout << endl << endl << endl << 64 - j << " iterations left" << endl;
+			cout << endl << endl << endl << 63 - j << " iterations left" << endl;
 		}
 
-		cout << "results for benchmark" << bench << "with NSE_RND" << endl;
+		cout << "results for benchmark " << bench << " with NSE_RND" << endl;
 
 		if(i == 0) //small
 		{

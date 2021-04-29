@@ -2,6 +2,13 @@
 
 float** weights = NULL;
 
+int* witness_tour = NULL;
+int* tmp_tour = NULL;
+
+int witness_tour_len = -1;
+
+int genomeLen = -1;
+
 float default_eval_simple(int* chromosome)
 {
 	////BOOST_LOG_TRIVIAL(info) << "evaluation function called";
@@ -16,13 +23,35 @@ float default_eval_simple(int* chromosome)
 
 float default_eval_dc(int* chromosome)
 {
+	if(!witness_tour)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "witness_tour not set";
+		exit(-8);
+	}
+	if(!tmp_tour)
+		tmp_tour = new int[witness_tour_len];
+
+	memcpy(tmp_tour, witness_tour, sizeof(int) * witness_tour_len);
+
+	swap_tour(tmp_tour, witness_tour, witness_tour_len);
 
 	return eval_tour(chromosome);
 }
 
 float default_eval_nse(int* chromosome)
-{
-	return eval_tour(chromosome);
+{	
+	if(!witness_tour)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "witness_tour not set";
+		exit(-8);
+	}
+	if(!tmp_tour)
+		tmp_tour = new int[witness_tour_len];
+
+	memcpy(tmp_tour, witness_tour, sizeof(int) * witness_tour_len);
+
+	shift_tour(tmp_tour, chromosome, witness_tour_len);
+	return eval_tour(tmp_tour);
 }
 
 float eval_tour(int *chromosome)
@@ -31,7 +60,13 @@ float eval_tour(int *chromosome)
 
 	float cost = 0;
   
-  	int len = genome::size();
+  	int len = witness_tour_len;
+
+  	if(len == -1)
+  	{
+		//BOOST_LOG_TRIVIAL(error) << "bench size not set";	
+  		exit(-9);
+  	}
 
   
 	for (int i = 0; i < len ; ++i)
@@ -103,7 +138,109 @@ void free_weights()
 	}
 	delete[] weights;
 	weights = NULL;
+
+	witness_tour = NULL;
+
+	witness_tour_len = -1;
+
+	delete[] tmp_tour;
+	tmp_tour = NULL;
 }
 
 
+void shift_tour(int *witness, int *chromo, int len)
+{
+	int vRank[len];
 
+	for (int i = 0; i < len; ++i)
+	{
+		vRank[i] = i;
+	}
+
+	
+
+	for (int i = 1; i < len; ++i)
+	{
+		int oldMigrantRank = vRank[i];
+		int newMigrantRank = vRank[i] + chromo[i - 1];
+
+		if(newMigrantRank >= len) newMigrantRank = newMigrantRank - len + 1;
+
+		if(newMigrantRank > oldMigrantRank)
+		{
+			for (int j = 0; j < len; ++j)
+				if((vRank[j] <= newMigrantRank) && (vRank[j] >= oldMigrantRank))
+					vRank[j]--;
+		}
+		else
+		{
+			for (int j = 0; j < len; ++j)
+				if((vRank[j] < oldMigrantRank) && (vRank[j] >= newMigrantRank))
+					vRank[j]++;
+		}
+		vRank[i] = newMigrantRank;
+	}
+
+	int tour[len];
+
+	for (int i = 0; i < len; ++i)
+	{
+		tour[i] = -55;
+	}
+
+	for (int i = 0; i < len; ++i)
+	{
+		tour[vRank[i]] = witness[i];
+	}
+
+	for (int i = 0; i < len; ++i)
+	{
+		//Rprintf("%d ", tour[i]);
+		witness[i] = tour[i];
+	}
+}
+
+void swap_tour(int* witness, int* chromo, int len)
+{
+	for (int i = 0; i < len - 1; ++i)
+	{
+		int tmp = witness[chromo[i]-1];
+		witness[chromo[i]-1] = witness[chromo[i + 1]-1];
+		witness[chromo[i + 1]-1] = tmp;
+	}
+	return;
+}
+
+
+int* normalizeTour(int *tour, int len)
+{
+	if(tour[0] == 1)
+		return tour;
+
+	int t[len];
+
+	//find the index of city 1
+	int index_1 = -1;
+	for (int i = 0; i < len; ++i)
+	{
+		t[i] = tour[i];
+		if(tour[i] == 1)
+		{
+			index_1 = i;
+			//break;
+		}
+	}
+
+	for (int i = 0; i < len; ++i)
+	{
+		tour[i] = t[(i + index_1) % len];
+	}
+
+	return tour;
+}
+
+void set_witness_tour(int* wt, int len)
+{
+	witness_tour = wt;
+	witness_tour_len = len;
+}

@@ -4,13 +4,13 @@ int genome::chromoSize = -1;
 
 std::default_random_engine genome::generator;
 
-std::uniform_int_distribution<int> *genome::distribution;
+std::uniform_int_distribution<int> *genome::distribution = NULL;
 
-int genome::min;
-int genome::max;
-bool genome::allowRepeat;
+int genome::min = -1;
+int genome::max = -1;
+bool genome::allowRepeat = false;
 
-eval genome::eval_func;
+eval genome::eval_func = NULL;
 
 genome::genome(int *chromo)
 {
@@ -76,6 +76,8 @@ genome::~genome()
 	//BOOST_LOG_TRIVIAL(debug) << "distructing genome " << this << " :" << *this;
 	delete[] this->chromosome;
 	this->chromosome = NULL;
+
+	free_genome_vars();
 }
 
 int genome::size()
@@ -110,15 +112,24 @@ void genome::init_generator(int _min, int _max, bool _allowRepeat)
 {	
 	//BOOST_LOG_TRIVIAL(info) << "initialising generator with allowRepeat = " << _allowRepeat << " min = " << _min << " max = " << _max;
 
-	if(allowRepeat)
+	if(_allowRepeat)
 	{
-		generator.seed(time(NULL));
-		distribution = new std::uniform_int_distribution<int>(min,max);
+		if(!distribution)
+		{
+			generator.seed(time(NULL));
+			distribution = new std::uniform_int_distribution<int>(min,max);
+		}
 	}
 
 	allowRepeat = _allowRepeat;
 	min = _min;
 	max = _max;
+}
+
+void genome::free_genome_vars()
+{
+	delete distribution;
+	distribution = NULL;
 }
 
 

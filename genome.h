@@ -46,6 +46,8 @@ public:
 	//initialise the randomness generator
 	static void init_generator(int _min, int _max, bool _allowRepeat);
 	
+	//free allocated variables
+	static void free_genome_vars();
 
 	static eval eval_func;
 
