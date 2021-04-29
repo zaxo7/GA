@@ -112,7 +112,12 @@ void genome::init_generator(int _min, int _max, bool _allowRepeat)
 {	
 	//BOOST_LOG_TRIVIAL(info) << "initialising generator with allowRepeat = " << _allowRepeat << " min = " << _min << " max = " << _max;
 
-	if(_allowRepeat)
+	allowRepeat = _allowRepeat;
+	min = _min;
+	max = _max;
+	
+
+	if(allowRepeat)
 	{
 		if(!distribution)
 		{
@@ -120,10 +125,6 @@ void genome::init_generator(int _min, int _max, bool _allowRepeat)
 			distribution = new std::uniform_int_distribution<int>(min,max);
 		}
 	}
-
-	allowRepeat = _allowRepeat;
-	min = _min;
-	max = _max;
 }
 
 void genome::free_genome_vars()

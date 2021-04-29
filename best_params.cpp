@@ -229,7 +229,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < 64; ++j)
 		{
 			cout << results[j]->best_genome.cost << ", ";
-		}*/
+		}
 
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " DOUBLE_CHROMOSOME_NN" << endl;
@@ -355,7 +355,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < 64; ++j)
 		{
 			cout << results[j]->best_genome.cost << ", ";
-		}
+		}*/
 
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " NSE_NN" << endl;
