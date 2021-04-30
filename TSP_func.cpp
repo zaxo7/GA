@@ -23,6 +23,7 @@ float default_eval_simple(int* chromosome)
 
 float default_eval_dc(int* chromosome)
 {
+	//BOOST_LOG_TRIVIAL(debug) << "default eval dc called with " << witness_tour_len << " and genome len " << genome::size() << " tab " << witness_tour;
 	if(!witness_tour)
 	{
 		//BOOST_LOG_TRIVIAL(error) << "witness_tour not set";
@@ -33,13 +34,14 @@ float default_eval_dc(int* chromosome)
 
 	memcpy(tmp_tour, witness_tour, sizeof(int) * witness_tour_len);
 
-	swap_tour(tmp_tour, witness_tour, witness_tour_len);
+	swap_tour(tmp_tour, chromosome, genome::size());
 
-	return eval_tour(chromosome);
+	return eval_tour(tmp_tour);
 }
 
 float default_eval_nse(int* chromosome)
 {	
+	//BOOST_LOG_TRIVIAL(debug) << "default eval nse called with " << witness_tour_len << " and genome len " << genome::size() << " witness_tour " << witness_tour;
 	if(!witness_tour)
 	{
 		//BOOST_LOG_TRIVIAL(error) << "witness_tour not set";
@@ -74,7 +76,7 @@ float eval_tour(int *chromosome)
 		cost += weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
 	}
 
-	//BOOST_LOG_TRIVIAL(debug) << "eval cost : " << cost;
+	/*//BOOST_LOG_TRIVIAL(debug) << "eval cost : " << cost;
 	if(cost < 0)
 	{
 		std::cout << "gen size : " << genome::size() << std::endl;
@@ -86,7 +88,7 @@ float eval_tour(int *chromosome)
 		for (int i = 0; i < len ; ++i)
 		{
 			cost += weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
-			std::cout << "++weights["<<chromosome[i] - 1<<"][" << chromosome[(i + 1) % len ] - 1 << "]" << weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
+			//std::cout << "++weights["<<chromosome[i] - 1<<"][" << chromosome[(i + 1) % len ] - 1 << "]" << weights[chromosome[i] - 1][chromosome[(i + 1) % len ] - 1];
 		}
 
 		std::cout << std::endl;
@@ -99,7 +101,7 @@ float eval_tour(int *chromosome)
 			std::cout << std::endl;
 		}
 		exit(-7);
-	}
+	}*/
 
 	return cost; 
 }
@@ -128,17 +130,28 @@ void set_weights(float** w)
 }
 
 
-void free_weights()
+void free_TSP_func_vars()
 {
 	//BOOST_LOG_TRIVIAL(debug) << "freeing weights with size " << genome::size() << "*" << genome::size();
-	for (int i = 0; i < genome::size(); ++i)
+	/*for (int i = 0; i < genome::size(); ++i)
 	{
 		delete[] weights[i];
 		weights[i] = NULL;
 	}
 	delete[] weights;
-	weights = NULL;
+	weights = NULL;*/
 
+	//std::cout << "deleted witness = " << witness_tour << " with len " << witness_tour_len << std::endl;
+	if(witness_tour)
+	{		
+		for (int i = 0; i < witness_tour_len; ++i)
+		{
+			std::cout << witness_tour[i] << ", ";
+		}
+		std::cout << std::endl;
+	}
+
+	delete[] witness_tour;
 	witness_tour = NULL;
 
 	witness_tour_len = -1;
@@ -150,6 +163,7 @@ void free_weights()
 
 void shift_tour(int *witness, int *chromo, int len)
 {
+	//std::cout << "creating vrank with length of " << len;
 	int vRank[len];
 
 	for (int i = 0; i < len; ++i)
@@ -204,9 +218,10 @@ void swap_tour(int* witness, int* chromo, int len)
 {
 	for (int i = 0; i < len - 1; ++i)
 	{
-		int tmp = witness[chromo[i]-1];
-		witness[chromo[i]-1] = witness[chromo[i + 1]-1];
-		witness[chromo[i + 1]-1] = tmp;
+		int tmp = witness[chromo[i]];
+		witness[chromo[i]] = witness[chromo[i + 1]];
+		witness[chromo[i + 1]] = tmp;
+		////BOOST_LOG_TRIVIAL(debug) << "swaping witness[" << chromo[i] << "] and witness[" << chromo[i + 1] << "] with values = (" << tmp << ", " << witness[chromo[i]] << ")"; 
 	}
 	return;
 }

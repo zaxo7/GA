@@ -11,7 +11,7 @@ float eval_tour(int *chromosome);
 
 void set_weights(float** w);
 
-void free_weights();
+void free_TSP_func_vars();
 
 void shift_tour(int* witness, int* chromo, int len);
 

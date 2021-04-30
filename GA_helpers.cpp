@@ -2,10 +2,13 @@
 
 // float** coordsMatrix = NULL;
 
-//random numbers generator
-std::random_device random_device;
-std::mt19937 *random_engine = NULL;
-std::uniform_int_distribution<int> *get_rand = NULL;
+namespace GA_h
+{
+	//random numbers generator
+	std::random_device random_device;
+	std::mt19937 *random_engine = NULL;
+	std::uniform_int_distribution<int> *get_rand = NULL;	
+}
 
 void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 {
@@ -58,22 +61,22 @@ double *a = NULL;
 
 double* GA_h::dnorm(int min, int max)
 {
-  	std::vector<double> x;
-  	for (int i = min; i <= max; ++i)
-  	{
-  		x.push_back(i);
-  	}
+  	std::vector<double> x(max - min + 1);
+  	
+  	std::iota(x.begin(), x.end(), min);
 
   	std::vector<double> prb = stats::dnorm(x, 0.0, (float)max/3, false);
+
+  	////BOOST_LOG_TRIVIAL(debug) << "allocated size = " << x.size() << " returned size = " << prb.size();
 
 
   	if(!a)
   	{
-  		a = new double[(max - min)];//(double*)malloc(sizeof(double) * (max - min));
+  		a = new double[(max - min) + 1];//(double*)malloc(sizeof(double) * (max - min));
   	}
   	
 	
-	for (int i = 0; i < (max - min); ++i)
+	for (int i = 0; i < (max - min + 1); ++i)
 	{
 		a[i] = prb[i];
 	}
@@ -187,17 +190,19 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans)
 {
 	//BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
-
-	if(!p || !perm || !random_engine || !get_rand)
+	if(!random_engine || !get_rand)
 	{
 		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
-
+		//std::cout << "init the GA_h get_rand and engine" << random_engine << " " << get_rand << std::endl;
 		random_engine->seed(time(NULL));
 
 		//srand48(time(NULL));
+	}
 
+	if(!p || !perm)
+	{
 		p = new double[n];//(double*)malloc(sizeof(double) * n);
 
 		perm = new int[n];//(int*)malloc(sizeof(int) * n);
@@ -274,27 +279,29 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 
 static void SampleReplace(int k, int min_n, int n, int *y)
 {
-  int i;
+	using namespace GA_h;
+	int i;
 
-  for (i = 0; i < k; i++)
-    y[i] = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX) + min_n;
+	for (i = 0; i < k; i++)
+	y[i] = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX) + min_n;
 }
 
 
 static void SampleNoReplace(int k, int min_n, int n, int *y, int *x)
 {
-  int i, j;
+	using namespace GA_h;
+	int i, j;
 
-  for (i = min_n; i < (n + min_n); i++)
-    x[i - min_n] = i;
+	for (i = min_n; i < (n + min_n); i++)
+	x[i - min_n] = i;
 
-  for (i = 0; i < k; i++) 
-  {
-    j = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
-    
-    y[i] = x[j];
-    x[j] = x[--n];
-  }
+	for (i = 0; i < k; i++) 
+	{
+	j = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+
+	y[i] = x[j];
+	x[j] = x[--n];
+	}
 }
 
 
@@ -306,10 +313,11 @@ int *GA_h::sample(int k, int n, bool replace)
 
 int *GA_h::sample(int min_k, int k, int n, bool replace)
 {
-	if(!random_engine && !get_rand)
-	{
+	if(!random_engine || !get_rand)
+	{	
 		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
+		//std::cout << "init the GA_h get_rand and engine" << random_engine << " " << get_rand << std::endl;
 
 
 		random_engine->seed(time(NULL));
@@ -345,6 +353,8 @@ void GA_h::free_GA_helpers_vars()
 	p = NULL;
 	delete[] perm;
 	perm = NULL;
+
+	//std::cout << "freeing rnd " << random_engine << " " << get_rand << std::endl;
 
 	delete random_engine;
 	random_engine = NULL;

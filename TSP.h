@@ -122,6 +122,8 @@ public:
 
 	void setLogging(bool l);
 
+	void redirect(bool rev = false);
+
 	// void checkCoords();
 
 	~TSP();

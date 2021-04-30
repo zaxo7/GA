@@ -44,10 +44,10 @@ private:
 	bool showSettings;
 	bool verbose;
 
-	//random numbers generator
-	std::random_device random_device;
-	std::mt19937 *random_engine;
-	std::uniform_int_distribution<int> *get_rand;
+	/*//random numbers generator
+	std::random_device random_dev_ga;
+	std::mt19937 *random_eng_ga;
+	std::uniform_int_distribution<int> *get_uni_rnd_ga;*/
 
 	//counters
 	int nbr_mutations;

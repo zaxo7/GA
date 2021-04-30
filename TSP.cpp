@@ -42,7 +42,7 @@ TSP::TSP()
     allowrepeat = false;
     verbose = false;
 
-    log = true;
+    log = false;
 
     logFile = string("log.txt");
 }
@@ -151,7 +151,7 @@ GA* TSP::init_engine()
     //BOOST_LOG_TRIVIAL(debug) << "initialising engine"; 
     GA* engine;
 
-    engine = new GA(genomeLen, codonMin, codonMax, NULL, NULL, initial, initial_count, popSize, iterations, termination_cost, true, mutationChance, elitism, monitorFunc, evalFunc, selectionFunc, crossoverFunc, mutationFunc, allowrepeat, false, verbose);
+    engine = new GA(genomeLen, codonMin, codonMax, NULL, NULL, initial, initial_count, popSize, iterations, termination_cost, true, mutationChance, elitism, monitorFunc, evalFunc, selectionFunc, crossoverFunc, mutationFunc, allowrepeat, true, verbose);
 
     return engine;
 }
@@ -185,18 +185,20 @@ void TSP::prepare_parameters()
         {
             if(is_rand_init)
             {
-                initial = new int*;//(int**)malloc(sizeof(int*));
+                initial = new int*[1];//(int**)malloc(sizeof(int*));
                 initial[0] = GA_h::sample(codonMin, codonMax, genomeLen, allowrepeat);
                 initial_count = 1;
             }    
             else
             {
-                initial = new int*;//(int**)malloc(sizeof(int*));
+                initial = new int*[1];//(int**)malloc(sizeof(int*));
                 initial[0] = ANN();
                 initial_count = 1;
                 //BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
             }
         }
+
+        std::cout << "solving with SIMPLE" << (is_rand_init ? "_RND":"_NN") << std::endl;
     }
     else if(solve_type == DOUBLE_CHROMOSOME_NN || (solve_type == DOUBLE_CHROMOSOME_RND))
     {
@@ -204,8 +206,8 @@ void TSP::prepare_parameters()
 
         //int the Double chromosome type the genome len can be whatever > 2 and should be even
         genomeLen = benchSize * 2;
-        codonMin = 1;
-        codonMax = benchSize;
+        codonMin = 0;
+        codonMax = benchSize - 1;
 
         if(evalFunc == NULL)
             evalFunc = default_eval_dc;
@@ -214,13 +216,15 @@ void TSP::prepare_parameters()
         {
             if(is_rand_init)
             {
-                set_witness_tour(GA_h::sample(codonMin, codonMax, benchSize, allowrepeat), benchSize);
+                set_witness_tour(GA_h::sample(1, benchSize, benchSize, false), benchSize);
             }    
             else
             {
                 set_witness_tour(ANN(), benchSize);
             }
         }
+
+        std::cout << "solving with DOUBLE_CHROMOSOME" << (is_rand_init ? "_RND":"_NN") << std::endl;
     }
     else if(solve_type == NSE_NN || (solve_type == NSE_RND))
     {
@@ -238,13 +242,14 @@ void TSP::prepare_parameters()
         {
             if(is_rand_init)
             {
-                set_witness_tour(normalizeTour(GA_h::sample(codonMin, benchSize, benchSize, allowrepeat), benchSize), benchSize);
+                set_witness_tour(normalizeTour(GA_h::sample(codonMin, benchSize, benchSize, false), benchSize), benchSize);
             }    
             else
             {
                 set_witness_tour(ANN(), benchSize);
             }
         }
+        std::cout << "solving with NSE" << (is_rand_init ? "_RND":"_NN") << std::endl;
     }
 
 }
@@ -311,6 +316,7 @@ float** TSP::load(string benchmark)
 
     	//get cursor position
     	int fileSize = benchFile.tellg();
+        fileSize++;
 
     	//reinit the cursor
     	benchFile.clear();
@@ -334,7 +340,7 @@ float** TSP::load(string benchmark)
         smatch matches;
 
         //convert buffer to string
-        string text = string(buffer);
+        string text = string(buffer,fileSize);
         delete[] buffer;
         buffer = NULL;
 
@@ -380,7 +386,7 @@ float** TSP::load(string benchmark)
 	           	coordsMat[i][0] =  stof(matches[1]);
                	coordsMat[i++][1] =  stof(matches[2]);
 
-	           	//BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
+	           	////BOOST_LOG_TRIVIAL(info) << "found " << matches.size() << " matches (" << coordsMat[i-1][0] << ", " << coordsMat[i-1][1] << ") in " << line ;
 	        }
 	        
         }
@@ -429,6 +435,7 @@ float** TSP::getWeights()
 int* TSP::ANN(float **coords)
 {
     //BOOST_LOG_TRIVIAL(debug) << "ANN called bs = " << benchSize;
+    //std::cout << "ANN called bs = " << benchSize << std::endl;
 
     if(genomeLen == -1)
         genomeLen = benchSize;
@@ -436,7 +443,7 @@ int* TSP::ANN(float **coords)
     if(coords == NULL)
         coords = weightsMatrix;
 
-    int* tour = new int[genomeLen];//(int*)malloc(sizeof(int) * genomeLen);
+    int* tour = new int[benchSize];//(int*)malloc(sizeof(int) * genomeLen);
     //trouver le max dans la matrice
     int matrix_max = coords[0][0];
     for (int i = 0; i < benchSize; ++i)
@@ -514,8 +521,6 @@ int* TSP::ANN(float **coords)
 
         tour[i] = suiv;
     }
-
-    coords = NULL;
 
     return tour;
 }
@@ -664,6 +669,7 @@ TSP::~TSP()
     
     for (int i = 0; i < initial_count; ++i)
     {
+        //std::cout << "deleting initial " << initial[i] << std::endl;
         delete[] initial[i];
         initial[i] = NULL;
         ////BOOST_LOG_TRIVIAL(debug) << "initial pointer = " << initial <<" initial[0]" << initial[0]; 
@@ -680,8 +686,26 @@ TSP::~TSP()
 
     delete[] v;
     v = NULL;
+
+    free_TSP_func_vars();
 }
 
+int fd = 0;
+void TSP::redirect(bool rev)
+{
+    if(rev)
+    {
+        fflush(stdout);
+        dup2(fd, fileno(stdout));
+        close(fd);
+    }
+    else
+    {
+        fflush(stdout);
+        fd = dup(fileno(stdout));
+        freopen(logFile.c_str(), "a+", stdout);
+    }
+}
 
 
 // void TSP::checkCoords()

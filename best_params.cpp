@@ -107,7 +107,7 @@ int main(int argc, char const *argv[])
 
 		int total_time = 0;
 
-		/*for (int j = 0; j < 64; j++)
+		for (int j = 0; j < 64; j++)
 		{
 			if(solver != NULL)
 			{
@@ -233,7 +233,8 @@ int main(int argc, char const *argv[])
 
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " DOUBLE_CHROMOSOME_NN" << endl;
-
+		
+		
 		total_time = 0;
 
 		for (int j = 0; j < 64; j++)
@@ -355,7 +356,11 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < 64; ++j)
 		{
 			cout << results[j]->best_genome.cost << ", ";
-		}*/
+			
+			//free to avoid memory leak
+			delete[] results[j]->best_genome.chromosome;
+			delete results[i];
+		}
 
 //--------------------------------------------------------------------
 		cout << "solving " << bench << " NSE_NN" << endl;

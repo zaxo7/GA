@@ -1,17 +1,18 @@
 MAKEFLAGS += -j4
 
 
-LIBS =  #-lprofiler -ltcmalloc #-lboost_log -lboost_log_setup  -lboost_system -lboost_thread -lpthread 
+#LIBS =   -lboost_log -lboost_log_setup  -lboost_system -lboost_thread -lpthread 
+#LIBS +=   -lprofiler -ltcmalloc
 #MUTATION_1 is the default mutation using a dampening_factor
 #USE_SWAP_MUTATION is used to remove duplicates
 DEFINES = -DUSE_SWAP_MUTATION #-DMUTATION_1
-OPT = #-static
+OPT = -static
 
 CC = g++
 
-LIBML = -Linclude/libml/lib/ -lml
+#LIBML = -Linclude/libml/lib/ -lml
 
-CFlags = -g -Wall
+CFlags = #-g -Wall #-fsanitize=address
 
 OBJDIR := ./obj/
 GA_lib_obj := $(addprefix $(OBJDIR)/, GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o)

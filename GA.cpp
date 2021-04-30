@@ -51,14 +51,14 @@ GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMa
 	
 	std::srand(std::time(NULL));
 
-	random_engine = new std::mt19937(random_device());
-	get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
+	/*random_eng_ga = new std::mt19937(random_dev_ga());
+	get_uni_rnd_ga = new std::uniform_int_distribution<int>(0, INT_MAX);
 
-	random_engine->seed(time(NULL));
+	random_eng_ga->seed(time(NULL));*/
 
 	init_my_rand(0, genomeLen);
 
-
+	//BOOST_LOG_TRIVIAL(debug) << "res inited with chromo of len " << genomeLen;
 	res = NULL;
 	res = new ga_result;//(ga_result*)malloc(sizeof(ga_result));
 	res->best_genome.chromosome = new int[genomeLen];
@@ -70,7 +70,7 @@ GA::GA(int genomeLen,  int codonMin, int codonMax, int *genomeMin, int *genomeMa
 	}
 }
 
-//namespace logging = //BOOST::log;
+//namespace logging = BOOST::log;
 
 void GA::init_logger()
 {
@@ -276,7 +276,11 @@ ga_result* GA::solve()
 		std::cout << "ok1" << std::endl;*/
 
 		for(int chromo = 0; chromo < popSize; chromo++)
+		{
+			////BOOST_LOG_TRIVIAL(info) << "calculating evaluation for " << *population[chromo];
+
 			evalVals[chromo] = population[chromo]->get_cost();
+		}
 
 		//BOOST_LOG_TRIVIAL(info) << "extracting some statistics";
 
@@ -371,6 +375,8 @@ ga_result* GA::solve()
 		//SampleReplace(10, parentProb, perm, 2, ans);
 		//ProbSampleNoReplace(10, parentProb, perm, 2, ans, 122);
 
+		//int mean = 0;
+
 		//fill the rest with crossover
 		for (int child = elitism; child < popSize; ++child)
 		{
@@ -381,9 +387,11 @@ ga_result* GA::solve()
 			////BOOST_LOG_TRIVIAL(debug) << "ok here 1 " << child;
 			GA_h::ProbSampleNoReplace(popSize, parentProb, 2, parentInd);
 			////BOOST_LOG_TRIVIAL(debug) << "ok here 2 " << child;
+			parentInd[0] = popSize - parentInd[0] - 1;
+			parentInd[1] = popSize - parentInd[1] - 1;
 
-			parentProb[0] = parentProb[0] - popSize - 1;
-			parentProb[1] = parentProb[1] - popSize - 1;
+			//mean += (parentInd[0] + parentInd[1]) / 2;
+			////BOOST_LOG_TRIVIAL(debug) << "two random indexes (" << parentInd[0] << ", " << parentInd[1] << ")";
 
 			if((parentInd[0] >= popSize || (parentInd[0] < 0)) || (parentInd[1] >= popSize || (parentInd[1] < 0)))
 			{
@@ -403,6 +411,9 @@ ga_result* GA::solve()
 			delete[] son;
 			son = NULL;
 		}
+
+		////BOOST_LOG_TRIVIAL(debug) << "indexes mean = " << ((float)mean) / (popSize - elitism) ;
+
 		/*free(parentProb);
 		parentProb = NULL;*/
 
@@ -672,8 +683,8 @@ GA::~GA()
 		terminationCost = NULL;
 	}
 
-	delete random_engine;
-	delete get_rand;
+	/*delete random_eng_ga;
+	delete get_uni_rnd_ga;*/
 
 	free_genome_vars();
 

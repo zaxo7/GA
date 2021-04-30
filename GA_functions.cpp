@@ -1,9 +1,9 @@
 #include "GA_functions.h"
 
 //random numbers generator
-extern std::random_device random_device;
-extern std::mt19937 *random_engine ;
-extern std::uniform_int_distribution<int> *get_rand;
+extern std::random_device random_dev_gen;
+extern std::mt19937 *random_eng_gen;
+extern std::uniform_int_distribution<int> *get_uni_rnd_gen;
 
 bool default_monitor(ga_result& state)
 {
@@ -80,12 +80,12 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	//BOOST_LOG_TRIVIAL(info) << "default_mutation called";
 
 	
-	if(!random_engine && !get_rand)
+	if(!random_eng_gen && !get_uni_rnd_gen)
 	{
-		random_engine = new std::mt19937(random_device());
-		get_rand = new std::uniform_int_distribution<int>(genomeMin[0], genomeMax[0]);
+		random_eng_gen = new std::mt19937(random_dev_gen());
+		get_uni_rnd_gen = new std::uniform_int_distribution<int>(genomeMin[0], genomeMax[0]);
 
-		random_engine->seed(time(NULL));
+		random_eng_gen->seed(time(NULL));
 	}	
 
 
@@ -163,7 +163,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 			
 			#else
 			
-			mutation[j] =  (*get_rand)(*random_engine) % (genomeMax[i] + 1);
+			mutation[j] =  (*get_uni_rnd_gen)(*random_eng_gen) % (genomeMax[i] + 1);
 			
 			#endif
 			
