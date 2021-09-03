@@ -1,40 +1,40 @@
 #include "genome.h" 
 
-int genome::chromoSize = -1;
+int genome::chromoSize;
 
 std::default_random_engine genome::generator;
 
-std::uniform_int_distribution<int> *genome::distribution = NULL;
+std::uniform_int_distribution<int> *genome::distribution;
 
-int genome::min = -1;
-int genome::max = -1;
-bool genome::allowRepeat = false;
+int genome::min;
+int genome::max;
+bool genome::allowRepeat;
 
-eval genome::eval_func = NULL;
+eval genome::eval_func;
 
 genome::genome(int *chromo)
 {
 	chromosome = NULL;
 	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
-	chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
+	chromosome = (int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
+		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
 		exit(-1);
 	}
 	memcpy(chromosome, chromo, sizeof(int) * chromoSize);
 	calculated = false;
-	//BOOST_LOG_TRIVIAL(debug) << "initialising genome statically to " << *this;
+	BOOST_LOG_TRIVIAL(debug) << "initialising genome statically to " << *this;
 }
 
 genome::genome(genome *&gen)
 {
 	this->chromosome = NULL;
 	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
-	this->chromosome = new int[chromoSize];//(int*)malloc(sizeof(int) * chromoSize);
+	this->chromosome = (int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
+		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
 		exit(-1);
 	}
 	memcpy(this->chromosome, gen->chromo(), sizeof(int) * chromoSize);
@@ -46,11 +46,11 @@ genome::genome(genome *&gen)
 genome::genome()
 {
 	chromosome = NULL;
-	//BOOST_LOG_TRIVIAL(debug) << "allocatig space for chromosome with length " << chromoSize;
-	chromosome = new int[chromoSize]; //(int*)malloc(sizeof(int) * chromoSize);
+	//BOOST_LOG_TRIVIAL(error) << "allocatig space for chromosome with length " << chromoSize;
+	chromosome = (int*)malloc(sizeof(int) * chromoSize);
 	if(!chromosome)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
+		BOOST_LOG_TRIVIAL(error) << "error allocatig space for chromosome in static initialisation";
 		exit(-1);
 	}
 	calculated = false;
@@ -68,16 +68,14 @@ genome::genome()
     	std::random_shuffle(chromosome, chromosome+chromoSize);
 		
     }
-	//BOOST_LOG_TRIVIAL(debug) << "initialising genome randomlly to " << *this;
+	BOOST_LOG_TRIVIAL(debug) << "initialising genome randomlly to " << *this;
 }
 
 genome::~genome()
 {
-	//BOOST_LOG_TRIVIAL(debug) << "distructing genome " << this << " :" << *this;
-	delete[] this->chromosome;
-	this->chromosome = NULL;
-
-	free_genome_vars();
+	BOOST_LOG_TRIVIAL(debug) << "distructing genome " << this << " :" << *this;
+	free(this->chromosome);
+	chromosome = NULL;
 }
 
 int genome::size()
@@ -87,7 +85,7 @@ int genome::size()
 
 void genome::setSize(int size)
 {
-	//BOOST_LOG_TRIVIAL(info) << "setting default genome size to " << size;
+	BOOST_LOG_TRIVIAL(info) << "setting default genome size to " << size;
 	chromoSize = size;
 }
 
@@ -110,33 +108,23 @@ float genome::get_cost()
 
 void genome::init_generator(int _min, int _max, bool _allowRepeat)
 {	
-	//BOOST_LOG_TRIVIAL(info) << "initialising generator with allowRepeat = " << _allowRepeat << " min = " << _min << " max = " << _max;
+	BOOST_LOG_TRIVIAL(info) << "initialising generator with allowRepeat = " << _allowRepeat << " min = " << _min << " max = " << _max;
+
+	if(allowRepeat)
+	{
+		generator.seed(time(NULL));
+		distribution = new std::uniform_int_distribution<int>(min,max);
+	}
 
 	allowRepeat = _allowRepeat;
 	min = _min;
 	max = _max;
-	
-
-	if(allowRepeat)
-	{
-		if(!distribution)
-		{
-			generator.seed(time(NULL));
-			distribution = new std::uniform_int_distribution<int>(min,max);
-		}
-	}
-}
-
-void genome::free_genome_vars()
-{
-	delete distribution;
-	distribution = NULL;
 }
 
 
 void genome::set_eval(eval& func)
 {
-	//BOOST_LOG_TRIVIAL(info) << "setting evaluation function";
+	BOOST_LOG_TRIVIAL(info) << "setting evaluation function";
 	eval_func = func;
 }
 

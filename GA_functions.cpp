@@ -1,9 +1,9 @@
 #include "GA_functions.h"
 
 //random numbers generator
-extern std::random_device random_dev_gen;
-extern std::mt19937 *random_eng_gen;
-extern std::uniform_int_distribution<int> *get_uni_rnd_gen;
+extern std::random_device random_device;
+extern std::mt19937 *random_engine ;
+extern std::uniform_int_distribution<int> *get_rand;
 
 bool default_monitor(ga_result& state)
 {
@@ -17,7 +17,7 @@ genome** default_selection(genome**& population, int popSize)
 	sortedPopulation = (genome**)malloc(sizeof(genome*) * popSize);
 	if(!sortedPopulation)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "can't allocate the sortedPopulation";
+		BOOST_LOG_TRIVIAL(error) << "can't allocate the sortedPopulation";
 		exit(-1);
 	}*/
 
@@ -31,11 +31,11 @@ genome** default_selection(genome**& population, int popSize)
 	//sorting the population
 	std::sort(population, population + popSize, gen_comp);
 
-	//BOOST_LOG_TRIVIAL(debug) << "the sorted population";
+	BOOST_LOG_TRIVIAL(debug) << "the sorted population";
 
 	for (int i = 0; i < popSize; ++i)
 	{
-		//BOOST_LOG_TRIVIAL(debug) << *population[i];
+		BOOST_LOG_TRIVIAL(debug) << *population[i];
 	}
 
 
@@ -44,18 +44,18 @@ genome** default_selection(genome**& population, int popSize)
 
 int* default_crossover(int* parent1, int* parent2, int genomeLen)
 {
-	//BOOST_LOG_TRIVIAL(info) << "default_crossover called";
+	BOOST_LOG_TRIVIAL(info) << "default_crossover called";
 	int* child = NULL;
-	child = new int[genomeLen];//(int *)malloc(sizeof(int) * genomeLen);
+	child = (int *)malloc(sizeof(int) * genomeLen);
 	if(!child)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "can't allocate space for new child";
+		BOOST_LOG_TRIVIAL(error) << "can't allocate space for new child";
 		exit(-1);
 	}
 
 	int cross_point = my_rand();
 
-	//BOOST_LOG_TRIVIAL(info) << "cross_point = " << cross_point;
+	BOOST_LOG_TRIVIAL(info) << "cross_point = " << cross_point;
 
 	if(cross_point == 0)
 	{
@@ -77,15 +77,15 @@ int* default_crossover(int* parent1, int* parent2, int genomeLen)
 
 int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *genomeMax, double dampeningFactor, bool allowRepeat)
 {
-	//BOOST_LOG_TRIVIAL(info) << "default_mutation called";
+	BOOST_LOG_TRIVIAL(info) << "default_mutation called";
 
 	
-	if(!random_eng_gen && !get_uni_rnd_gen)
+	if(!random_engine && !get_rand)
 	{
-		random_eng_gen = new std::mt19937(random_dev_gen());
-		get_uni_rnd_gen = new std::uniform_int_distribution<int>(genomeMin[0], genomeMax[0]);
+		random_engine = new std::mt19937(random_device());
+		get_rand = new std::uniform_int_distribution<int>(genomeMin[0], genomeMax[0]);
 
-		random_eng_gen->seed(time(NULL));
+		random_engine->seed(time(NULL));
 	}	
 
 
@@ -118,7 +118,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	//int* oldchromo = (int*)malloc(sizeof(int) * genomeLen);
 	//memcpy(oldchromo, chromo, sizeof(int) * genomeLen);
 
-	//BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
+	BOOST_LOG_TRIVIAL(info) << "we gonna preform " << num_mut << " mutations on the chromosome " << *gen;
 	
 
 	#ifdef MUTATION_1
@@ -146,7 +146,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 	{
 		if(mut_loc[i]) //if we are in the mutation location
 		{
-			//BOOST_LOG_TRIVIAL(info) << "mutation number " << j << " at codon number " << i;
+			BOOST_LOG_TRIVIAL(info) << "mutation number " << j << " at codon number " << i;
 			
 			#ifdef MUTATION_1
 			
@@ -163,7 +163,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 			
 			#else
 			
-			mutation[j] =  (*get_uni_rnd_gen)(*random_eng_gen) % (genomeMax[i] + 1);
+			mutation[j] =  (*get_rand)(*random_engine) % (genomeMax[i] + 1);
 			
 			#endif
 			
@@ -208,7 +208,7 @@ int default_mutation(genome *gen, float mutationChance, int *genomeMin, int *gen
 			//set the calculated flag back to false bcs the cost will change
 	gen->rest_calculated();
 
-	//BOOST_LOG_TRIVIAL(info) << "chromosome after mutation : " << *gen;
+	BOOST_LOG_TRIVIAL(info) << "chromosome after mutation : " << *gen;
 
 	/*int diff = 0;
 

@@ -1,13 +1,8 @@
 #ifndef DEF_types
 #define DEF_types
-/*#include <boost/log/core.hpp>
+#include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>*/
-
-#include <bits/stdc++.h>
-#include<stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <boost/log/expressions.hpp> 
 
 #define STATS_ENABLE_INTERNAL_VEC_FEATURES
 #define STATS_ENABLE_STDVEC_WRAPPERS
@@ -32,10 +27,6 @@ struct ga_result
 	int size;
 	unsigned long solve_time;
 	genome_str best_genome;
-	int* witness_tour;
-	int popSize;
-	int iterations;
-	float mutationChance;
 };
 
 //monitor function type

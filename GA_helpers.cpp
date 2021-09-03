@@ -1,14 +1,10 @@
 #include "GA_helpers.h"
 
-// float** coordsMatrix = NULL;
 
-namespace GA_h
-{
-	//random numbers generator
-	std::random_device random_device;
-	std::mt19937 *random_engine = NULL;
-	std::uniform_int_distribution<int> *get_rand = NULL;	
-}
+//random numbers generator
+std::random_device random_device;
+std::mt19937 *random_engine = NULL;
+std::uniform_int_distribution<int> *get_rand = NULL;
 
 void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 {
@@ -26,8 +22,8 @@ void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 
 	//int iv = 0;
 
-	//BOOST_LOG_TRIVIAL(info) << "unique chromo called";
-	////BOOST_LOG_TRIVIAL(debug) << "before unique";
+	BOOST_LOG_TRIVIAL(info) << "unique chromo called";
+	//BOOST_LOG_TRIVIAL(debug) << "before unique";
 	//delete (new genome(chromo));
 	//check for duplicates in the chromosome
 	int ind;
@@ -53,37 +49,31 @@ void GA_h::unique_chromo(int* chromo, int*& genMin, int*& genMax, int genomeLen)
 		if(chromo[ind] > genMax[ind])
 			chromo[ind] = genMin[ind];
 	}
-	////BOOST_LOG_TRIVIAL(debug) << "after unique";
+	//BOOST_LOG_TRIVIAL(debug) << "after unique";
 	//delete (new genome(chromo));
 }
 
-double *a = NULL;
 
 double* GA_h::dnorm(int min, int max)
 {
-  	std::vector<double> x(max - min + 1);
-  	
-  	std::iota(x.begin(), x.end(), min);
+  	std::vector<double> x;
+  	for (int i = min; i <= max; ++i)
+  	{
+  		x.push_back(i);
+  	}
 
   	std::vector<double> prb = stats::dnorm(x, 0.0, (float)max/3, false);
 
-  	////BOOST_LOG_TRIVIAL(debug) << "allocated size = " << x.size() << " returned size = " << prb.size();
-
-
+  	static double *a = NULL;
   	if(!a)
   	{
-  		a = new double[(max - min) + 1];//(double*)malloc(sizeof(double) * (max - min));
+  		a = (double*)malloc(sizeof(double) * (max - min));
   	}
-  	
 	
-	for (int i = 0; i < (max - min + 1); ++i)
+	for (int i = 0; i < max - min; ++i)
 	{
 		a[i] = prb[i];
 	}
-
-	/*std::cout << "ok 1.1" << std::endl;
-  	checkCoords();
-  	std::cout << "ok 1.2" << std::endl;*/
 
 	return a;
 }
@@ -91,16 +81,8 @@ double* GA_h::dnorm(int min, int max)
 
 int GA_h::dup(int *arr, int n)
 {
-	////BOOST_LOG_TRIVIAL(info) << "dup called";
+	//BOOST_LOG_TRIVIAL(info) << "dup called";
     int duplicate = -1;
-
-    /*std::cout << std::endl << "i got this chromo :";
-    for (int i = 0; i < n; ++i)
-    {
-    	std::cout << arr[i] << ", ";
-    }*/
-
-    fflush(stdout);
  
     // do for each element in the array
     for (int i = 0; i < n; i++)
@@ -184,28 +166,23 @@ static void revsort(double *a, int *ib, int n)
   ib[i] = ii;
     }
 }
-double *p = NULL;
-int *perm = NULL;
+
 void GA_h::ProbSampleNoReplace(int n, double *po,
                                 int nans, int *ans)
 {
-	//BOOST_LOG_TRIVIAL(debug) << "ProbSampleNoReplace called";
-	if(!random_engine || !get_rand)
+   	static double *p = NULL;
+   	static int *perm = NULL;
+	if(!random_engine && !get_rand)
 	{
 		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
 
-		//std::cout << "init the GA_h get_rand and engine" << random_engine << " " << get_rand << std::endl;
+
 		random_engine->seed(time(NULL));
 
-		//srand48(time(NULL));
-	}
+		p = (double*)malloc(sizeof(double) * n);
 
-	if(!p || !perm)
-	{
-		p = new double[n];//(double*)malloc(sizeof(double) * n);
-
-		perm = new int[n];//(int*)malloc(sizeof(int) * n);
+		perm = (int*)malloc(sizeof(int) * n);
 	}
 
 
@@ -216,10 +193,9 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	double rT, mass, totalmass;
 	int i, j, k, n1;
 
-	
+	//srand48(seed);
 
 	
-	////BOOST_LOG_TRIVIAL(debug) << "ok here 1.0";
 
 	/* Record element identities */
 	for (i = 0; i < n; i++)
@@ -241,28 +217,24 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 	
 	for (int i = 0; i < n; ++i)
 	{
-		std::cout << perm[i] << ", ";
-	}
-	*/
+		std::cout << p[i] << ", ";
+	}*/
 	/* Compute the sample */
 	totalmass = 1;
-	for (i = 0, n1 = n - 1; i < nans; i++, n1--) 
-	{
-		rT = totalmass * /*(((float) rand())/((float) RAND_MAX));//*/((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
-		mass = 0;
-		for (j = 0; j < n1; j++)
-		{
-		  mass += p[j];
-		  if (rT <= mass)
-		    break;
-		}
-		ans[i] = perm[j];
-		totalmass -= p[j];
-		for (k = j; k < n1; k++) 
-		{
-		  p[k] = p[k + 1];
-		  perm[k] = perm[k + 1];
-		}
+	for (i = 0, n1 = n - 1; i < nans; i++, n1--) {
+	rT = totalmass * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+	mass = 0;
+	for (j = 0; j < n1; j++) {
+	  mass += p[j];
+	  if (rT <= mass)
+	    break;
+	}
+	ans[i] = perm[j];
+	totalmass -= p[j];
+	for (k = j; k < n1; k++) {
+	  p[k] = p[k + 1];
+	  perm[k] = perm[k + 1];
+	}
 	}
 
 	//ajust probabilities to get more diversity
@@ -279,29 +251,27 @@ void GA_h::ProbSampleNoReplace(int n, double *po,
 
 static void SampleReplace(int k, int min_n, int n, int *y)
 {
-	using namespace GA_h;
-	int i;
+  int i;
 
-	for (i = 0; i < k; i++)
-	y[i] = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX) + min_n;
+  for (i = 0; i < k; i++)
+    y[i] = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX) + min_n;
 }
 
 
 static void SampleNoReplace(int k, int min_n, int n, int *y, int *x)
 {
-	using namespace GA_h;
-	int i, j;
+  int i, j;
 
-	for (i = min_n; i < (n + min_n); i++)
-	x[i - min_n] = i;
+  for (i = min_n; i < (n + min_n); i++)
+    x[i - min_n] = i;
 
-	for (i = 0; i < k; i++) 
-	{
-	j = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
-
-	y[i] = x[j];
-	x[j] = x[--n];
-	}
+  for (i = 0; i < k; i++) 
+  {
+    j = n * ((float)(*get_rand)(*random_engine) / (float)RAND_MAX);
+    
+    y[i] = x[j];
+    x[j] = x[--n];
+  }
 }
 
 
@@ -313,18 +283,17 @@ int *GA_h::sample(int k, int n, bool replace)
 
 int *GA_h::sample(int min_k, int k, int n, bool replace)
 {
-	if(!random_engine || !get_rand)
-	{	
+	if(!random_engine && !get_rand)
+	{
 		random_engine = new std::mt19937(random_device());
 		get_rand = new std::uniform_int_distribution<int>(0, INT_MAX);
-		//std::cout << "init the GA_h get_rand and engine" << random_engine << " " << get_rand << std::endl;
 
 
 		random_engine->seed(time(NULL));
 	}
 
 
-	int* result = new int[n];//(int*)malloc(sizeof(int) * n);
+	int* result = (int*)malloc(sizeof(int) * n);
 
 	if(replace)
 	{
@@ -334,42 +303,14 @@ int *GA_h::sample(int min_k, int k, int n, bool replace)
 	{	
 		if (n > (k - min_k + 1)) 
 		{
-	        //BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
+	        BOOST_LOG_TRIVIAL(error) << "sample: nsamples must be <= n";
 	        return NULL;
       	}
-		int *tmp = new int[n];//(int*)malloc(sizeof(int) * n);
+		int *tmp = (int*)malloc(sizeof(int) * n);
 		SampleNoReplace(n, min_k, k, result, tmp);
-		delete[] tmp;
+		free(tmp);
 	}
 
 
 	return result;
 }
-
-
-void GA_h::free_GA_helpers_vars()
-{
-	delete[] p;
-	p = NULL;
-	delete[] perm;
-	perm = NULL;
-
-	//std::cout << "freeing rnd " << random_engine << " " << get_rand << std::endl;
-
-	delete random_engine;
-	random_engine = NULL;
-	delete get_rand;
-	get_rand = NULL;
-
-	//delete[] a;
-	a = NULL;
-}
-
-// void GA_h::checkCoords()
-// {
-//     for (int i = 0; i < genome::size(); ++i)
-//     {
-//             if(coordsMatrix[i][0] < 0 || (coordsMatrix[i][1] < 0))
-//                 exit(-10);            
-//     }
-// }
