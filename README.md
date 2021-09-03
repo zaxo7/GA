@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # GA
 a C++ library for genetic algorithms
 =======
