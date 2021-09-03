@@ -17,7 +17,7 @@ CFlags = #-g -Wall #-fsanitize=address
 OBJDIR := ./obj/
 GA_lib_obj := $(addprefix $(OBJDIR)/, GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o)
 
-all: | clear test test2 best_params
+all: | clear test test2 best_params solve_14
 
 GA_lib: | GA.o GA_functions.o GA_helpers.o genome.o gen_functions.o
 
@@ -69,6 +69,14 @@ best_params: best_params.o GA_lib TSP.o
 
 best_params.o:
 	$(CC) $(CFlags) $(DEFINES) -c best_params.cpp -o obj/best_params.o
+
+
+solve_14: solve_14.o GA_lib TSP.o
+	$(CC) $(CFlags) $(OPT) obj/solve_14.o obj/TSP.o obj/TSP_func.o obj/GA.o obj/genome.o obj/GA_functions.o obj/gen_functions.o obj/GA_helpers.o $(LIBS) -o release/solve_14_args
+
+
+solve_14.o: 
+	$(CC) $(CFlags) $(DEFINES) -c solve_14.cpp -o obj/solve_14.o
 
 
 libml:

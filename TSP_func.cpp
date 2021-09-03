@@ -142,14 +142,14 @@ void free_TSP_func_vars()
 	weights = NULL;*/
 
 	//std::cout << "deleted witness = " << witness_tour << " with len " << witness_tour_len << std::endl;
-	if(witness_tour)
+	/*if(witness_tour)
 	{		
 		for (int i = 0; i < witness_tour_len; ++i)
 		{
 			std::cout << witness_tour[i] << ", ";
 		}
 		std::cout << std::endl;
-	}
+	}*/
 
 	delete[] witness_tour;
 	witness_tour = NULL;

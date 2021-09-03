@@ -4,6 +4,9 @@ using namespace std;
 
 string TSP::default_root = string("./benchmarks/");
 
+extern int witness_tour_len;
+extern int* witness_tour;
+
 //extern float** coordsMatrix;
 
 TSP::TSP()
@@ -103,6 +106,14 @@ ga_result* TSP::solve(GA_type solve_type)
 
 
     result = GA_engine->solve();
+
+    if(solve_type == DOUBLE_CHROMOSOME_NN || (solve_type == DOUBLE_CHROMOSOME_RND) || (solve_type == NSE_NN) || (solve_type == NSE_RND))
+    {
+        result->witness_tour = new int[witness_tour_len];
+        memcpy(result->witness_tour, witness_tour, sizeof(int) * witness_tour_len);
+    }
+    else
+        result->witness_tour = NULL;
     
     print(log);
     //print();
@@ -605,6 +616,33 @@ void TSP::print(bool log)
     }
 
     cout << "\n\n\n\nResults for " << *benchName << endl;
+
+    if(result->witness_tour != NULL)
+    {
+        int *tmp_tour = new int[witness_tour_len];
+        memcpy(tmp_tour, witness_tour, sizeof(int) * witness_tour_len);
+
+        if(solve_type == DOUBLE_CHROMOSOME_RND || (solve_type == DOUBLE_CHROMOSOME_NN))
+            swap_tour(tmp_tour, result->best_genome.chromosome, genome::size());
+        else if(solve_type == NSE_RND || (solve_type == NSE_NN))
+            shift_tour(tmp_tour, result->best_genome.chromosome, witness_tour_len);
+
+        cout << "\nfinal tour : \n";
+        for (int i = 0; i < witness_tour_len; ++i)
+        {
+            cout << tmp_tour[i] << ", ";
+        }
+        cout << "\nwitness tour : \n";
+        for (int i = 0; i < witness_tour_len; ++i)
+        {
+            cout << result->witness_tour[i] << ", ";
+        }
+        cout << endl;
+
+        delete[] tmp_tour;
+        tmp_tour = NULL;
+    }
+
     GA_engine->print();
 
     if(log)

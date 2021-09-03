@@ -32,7 +32,7 @@ struct ga_result
 	int size;
 	unsigned long solve_time;
 	genome_str best_genome;
-
+	int* witness_tour;
 	int popSize;
 	int iterations;
 	float mutationChance;

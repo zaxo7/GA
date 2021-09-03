@@ -102,10 +102,10 @@ int main(int argc, char const *argv[])
 
 		float min_cost;
 		int min_cost_ind;
+		
+		int total_time = 0;
 
 		cout << "solving " << bench << " SIMPLE_NN" << endl;
-
-		int total_time = 0;
 
 		for (int j = 0; j < 64; j++)
 		{
@@ -338,6 +338,7 @@ int main(int argc, char const *argv[])
 			medium_param[1][0] = params[min_cost_ind][0];
 			medium_param[1][1] = params[min_cost_ind][1];
 			medium_param[1][2] = params[min_cost_ind][2];
+
 			cout << "popsize : " << medium_param[1][0] << endl
 			<< "iterations : " << medium_param[1][1] << endl
 			<< "mutation_chance : " << medium_param[1][2] << endl;
@@ -347,6 +348,7 @@ int main(int argc, char const *argv[])
 			big_param[1][0] = params[min_cost_ind][0];
 			big_param[1][1] = params[min_cost_ind][1];
 			big_param[1][2] = params[min_cost_ind][2];
+
 			cout << "popsize : " << big_param[1][0] << endl
 			<< "iterations : " << big_param[1][1] << endl
 			<< "mutation_chance : " << big_param[1][2] << endl;
@@ -358,8 +360,8 @@ int main(int argc, char const *argv[])
 			cout << results[j]->best_genome.cost << ", ";
 			
 			//free to avoid memory leak
-			delete[] results[j]->best_genome.chromosome;
-			delete results[i];
+			// delete[] results[j]->best_genome.chromosome;
+			// delete results[i];
 		}
 
 //--------------------------------------------------------------------
